@@ -1,0 +1,21 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-whattobring-dev-142706-authRole",
+      "UnauthRoleArn": "arn:aws:iam::846315410327:role/amplify-whattobring-dev-142706-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::846315410327:role/amplify-whattobring-dev-142706-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-whattobring-dev-142706-deployment",
+      "UnauthRoleName": "amplify-whattobring-dev-142706-unauthRole",
+      "StackName": "amplify-whattobring-dev-142706",
+      "StackId": "arn:aws:cloudformation:eu-west-2:846315410327:stack/amplify-whattobring-dev-142706/f3660280-2128-11ec-8348-02c50e1d0d5a",
+      "AmplifyAppId": "d1r9y2ca5iugtu"
+    },
+    "categories": {
+      "auth": {
+        "whattobring4a30bc4e": {},
+        "whattobring841dbbc3": {}
+      }
+    }
+  }
+}

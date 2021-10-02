@@ -1,57 +1,58 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
 import { Counter } from './features/counter/Counter';
-import './App.css';
+import './App.scss';
+import { Auth, Hub } from 'aws-amplify';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Home } from './app/screens/Home/Home';
+import { Topic } from './app/screens/Topic/Topic';
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    Hub.listen('auth', ({ payload: { event, data } }) => {
+      switch (event) {
+        case 'signIn':
+        case 'cognitoHostedUI':
+          getUser().then((userData) => {
+            setUser(userData);
+            console.log(userData);
+          });
+          break;
+        case 'signOut':
+          setUser(null);
+          break;
+        case 'signIn_failure':
+        case 'cognitoHostedUI_failure':
+          console.log('Sign in failure', data);
+          break;
+        default:
+          break;
+      }
+    });
+
+    getUser().then((userData) => setUser(userData));
+  }, []);
+  function getUser() {
+    return Auth.currentAuthenticatedUser()
+      .then((userData) => userData)
+      .catch(() => console.log('Not signed in'));
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <>
+      <Router basename={process.env.PUBLIC_URL}>
+        <div>
+          <Switch>
+            <Route path="/:topicId">
+              <Topic user={user}></Topic>
+            </Route>
+            <Route path="/">
+              <Home user={user} />
+            </Route>
+          </Switch>
+        </div>
+      </Router>
+    </>
   );
 }
 
