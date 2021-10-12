@@ -1,0 +1,66 @@
+.container {
+  height: 100vh;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  position: absolute;
+  z-index: 0;
+  overflow-x: hidden;
+}
+.topicSearchContainer {
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+  background-color: #ffcb77;
+}
+.heading {
+  text-align: center;
+  box-sizing: border-box;
+  padding: 5rem 1rem;
+  margin: 0rem 5rem;
+  border-bottom: 0.15rem solid #ffcb77;
+}
+.optionListContainer {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1 / span 8;
+  margin-left: 5rem;
+}
+.optionContainer {
+  height: 5.625rem;
+  box-sizing: border-box;
+  padding: 1rem;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+  border-bottom: 0.15rem solid #ffcb77;
+}
+.innerOptionsContainer {
+  display: flex;
+  align-items: center;
+}
+.contentsContainer {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+.linkAmazon {
+  background-color: #008148;
+  color: white;
+  padding: 0.5rem 1rem;
+}
+.btnAmazonText {
+  font-weight: bold;
+}
+.voteContainer {
+  margin: 0 1rem;
+  display: flex;
+}
+.upvotesContainer,
+.downvotesContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}

@@ -2,21 +2,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   height: 100vh;
   width: 100vw;
   top: 0;
   left: 0;
   position: absolute;
-  background-color: #ef5b5b;
+  background-color: #ffcb77;
   z-index: 0;
 }
-.autocomplete {
-  width: 90vw;
-  max-width: 40rem;
-}
+
 .authContainer {
   position: absolute;
   right: 1rem;
   top: 1rem;
   z-index: 1;
+}
+.heading {
+  padding-bottom: 2rem;
 }

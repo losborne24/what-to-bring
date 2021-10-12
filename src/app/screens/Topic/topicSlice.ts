@@ -1,30 +1,49 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../store';
-import { fetchTopic } from './topicAPI';
+import { fetchMoreOptions, fetchTopicAndOptions } from './topicAPI';
 
 export interface TopicState {
   topicData: {
     topicId: string;
     topicTextGeneric: string;
-    topicTextBold: string;
+    topicText: string;
   };
+  optionsData: {
+    optionId: number;
+    topicId: string;
+    optionText: string;
+    upvotes: number;
+    downvotes: number;
+    rank: number;
+    link?: string;
+  }[];
   status: 'idle' | 'loading' | 'failed';
+  offset: number;
 }
 
 const initialState: TopicState = {
   topicData: {
     topicId: '',
     topicTextGeneric: '',
-    topicTextBold: '',
+    topicText: '',
   },
+  optionsData: [],
   status: 'idle',
+  offset: 0,
 };
 
-export const topicAsync = createAsyncThunk(
-  'topic/fetchTopic',
+export const topicAndOptionsAsync = createAsyncThunk(
+  'topic/fetchTopicAndOptions',
   async (topicId: string) => {
-    const response = await fetchTopic(topicId);
-    console.log(response.data);
+    const response = await fetchTopicAndOptions(topicId);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+  }
+);
+export const moreOptionsAsync = createAsyncThunk(
+  'topic/fetchMoreOptions',
+  async (payload: { topicId: string; offset: number }) => {
+    const response = await fetchMoreOptions(payload.topicId, payload.offset);
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -37,12 +56,14 @@ export const topicSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(topicAsync.pending, (state) => {
+      .addCase(topicAndOptionsAsync.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(topicAsync.fulfilled, (state, action) => {
+      .addCase(topicAndOptionsAsync.fulfilled, (state, action) => {
         state.status = 'idle';
-        state.topicData = action.payload;
+        console.log(action.payload);
+        state.topicData = action.payload.topic;
+        state.optionsData = action.payload.options;
       });
   },
 });
@@ -50,6 +71,9 @@ export const topicSlice = createSlice({
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state: RootState) => state.topic.value)`
-export const selectTopic = (state: RootState) => state.topic.topicData;
+export const selectTopicAndOptions = (state: RootState) =>
+  state.topic.topicData;
+
+export const selectMoreOptions = (state: RootState) => state.topic.optionsData;
 
 export default topicSlice.reducer;

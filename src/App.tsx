@@ -16,7 +16,7 @@ function App() {
         case 'cognitoHostedUI':
           getUser().then((userData) => {
             setUser(userData);
-            console.log(userData);
+            console.log(userData.attributes);
           });
           break;
         case 'signOut':
@@ -43,9 +43,12 @@ function App() {
       <Router basename={process.env.PUBLIC_URL}>
         <div>
           <Switch>
-            <Route path="/:topicId">
-              <Topic user={user}></Topic>
-            </Route>
+            <Route
+              path="/:topicId"
+              component={(props: any) => (
+                <Topic {...props} user={user} key={window.location.pathname} />
+              )}
+            ></Route>
             <Route path="/">
               <Home user={user} />
             </Route>

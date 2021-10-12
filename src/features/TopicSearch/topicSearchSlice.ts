@@ -1,33 +1,32 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState, AppThunk } from '../../store';
-import { fetchFilterTopics } from './homeAPI';
+import { RootState, AppThunk } from '../../app/store';
+import { fetchFilterTopics } from './topicSearchAPI';
 
-export interface HomeState {
+export interface TopicSearchState {
   filterTopics: {
     topicId: string;
     topicTextGeneric: string;
-    topicTextBold: string;
+    topicText: string;
   }[];
   status: 'idle' | 'loading' | 'failed';
 }
 
-const initialState: HomeState = {
+const initialState: TopicSearchState = {
   filterTopics: [],
   status: 'idle',
 };
 
 export const filterTopicAsync = createAsyncThunk(
-  'home/fetchFilterTopics',
+  'topicSearch/fetchFilterTopics',
   async (topicId: string) => {
     const response = await fetchFilterTopics(topicId);
-    console.log(response.data);
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
 );
 
-export const homeSlice = createSlice({
-  name: 'home',
+export const topicSearchSlice = createSlice({
+  name: 'topicSearch',
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {},
@@ -46,6 +45,7 @@ export const homeSlice = createSlice({
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state: RootState) => state.topic.value)`
-export const selectFilterTopics = (state: RootState) => state.home.filterTopics;
+export const selectFilterTopics = (state: RootState) =>
+  state.topicSearch.filterTopics;
 
-export default homeSlice.reducer;
+export default topicSearchSlice.reducer;
