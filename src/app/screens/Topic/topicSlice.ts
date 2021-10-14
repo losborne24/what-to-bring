@@ -73,7 +73,7 @@ export const userDownvoteAsync = createAsyncThunk(
   async (optionId: number) => {
     const response = await setUserDownvote(optionId);
     // The value we return becomes the `fulfilled` action payload
-    return response.data;
+    return { isChange: response.isChange, optionId };
   }
 );
 export const userUpvoteAsync = createAsyncThunk(
@@ -81,7 +81,7 @@ export const userUpvoteAsync = createAsyncThunk(
   async (optionId: number) => {
     const response = await setUserUpvote(optionId);
     // The value we return becomes the `fulfilled` action payload
-    return response.data;
+    return { isChange: response.isChange, optionId };
   }
 );
 
@@ -113,14 +113,14 @@ export const topicSlice = createSlice({
           state.userVotes.upvotes = state.userVotes.upvotes.filter(
             (id) => id !== meta.arg
           );
-          let _option = state.optionsData.find(
+          const _option = state.optionsData.find(
             (option) => option.optionId === meta.arg
           );
           if (_option) _option.upvotes -= 1;
         }
         if (!state.userVotes.downvotes.includes(meta.arg)) {
           state.userVotes.downvotes.push(meta.arg);
-          let _option = state.optionsData.find(
+          const _option = state.optionsData.find(
             (option) => option.optionId === meta.arg
           );
           if (_option) _option.downvotes += 1;
@@ -128,6 +128,20 @@ export const topicSlice = createSlice({
       })
       .addCase(userDownvoteAsync.fulfilled, (state, action) => {
         state.status = 'idle';
+        if (action.payload.isChange === true) {
+          const _option = state.optionsData.find(
+            (option) => option.optionId === action.payload.optionId
+          );
+          if (_option) {
+            _option.rank += 1;
+            const index = state.optionsData.indexOf(_option);
+            state.optionsData.splice(
+              index + 1,
+              0,
+              state.optionsData.splice(index, 1)[0]
+            );
+          }
+        }
       })
       .addCase(userUpvoteAsync.pending, (state, { meta }) => {
         state.status = 'loading';
@@ -135,14 +149,14 @@ export const topicSlice = createSlice({
           state.userVotes.downvotes = state.userVotes.downvotes.filter(
             (id) => id !== meta.arg
           );
-          let _option = state.optionsData.find(
+          const _option = state.optionsData.find(
             (option) => option.optionId === meta.arg
           );
           if (_option) _option.downvotes -= 1;
         }
         if (!state.userVotes.upvotes.includes(meta.arg)) {
           state.userVotes.upvotes.push(meta.arg);
-          let _option = state.optionsData.find(
+          const _option = state.optionsData.find(
             (option) => option.optionId === meta.arg
           );
           if (_option) _option.upvotes += 1;
@@ -150,6 +164,20 @@ export const topicSlice = createSlice({
       })
       .addCase(userUpvoteAsync.fulfilled, (state, action) => {
         state.status = 'idle';
+        if (action.payload.isChange === true) {
+          const _option = state.optionsData.find(
+            (option) => option.optionId === action.payload.optionId
+          );
+          if (_option) {
+            _option.rank += 1;
+            const index = state.optionsData.indexOf(_option);
+            state.optionsData.splice(
+              index - 1,
+              0,
+              state.optionsData.splice(index, 1)[0]
+            );
+          }
+        }
       });
   },
 });
