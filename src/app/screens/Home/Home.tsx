@@ -13,7 +13,9 @@ export function Home(props: any) {
         <Typography variant="h2" className={styles.heading}>
           What to bring...
         </Typography>
-        <TopicSearch />
+        <div className={styles.topicSearchContainer}>
+          <TopicSearch />
+        </div>
       </div>
     </div>
   );

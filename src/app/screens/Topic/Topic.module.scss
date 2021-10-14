@@ -7,13 +7,24 @@
   z-index: 0;
   overflow-x: hidden;
 }
-.topicSearchContainer {
+.navContainer {
   height: 4rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 1rem 0;
+  justify-content: space-between;
+  padding: 1rem 1rem;
   background-color: #ffcb77;
+}
+.topicSearchContainer {
+  & > * {
+    padding-right: 1rem;
+  }
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+}
+.txtWhatToBring {
+  flex-shrink: 0;
 }
 .heading {
   text-align: center;

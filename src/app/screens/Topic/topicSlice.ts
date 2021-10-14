@@ -1,6 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../store';
-import { fetchMoreOptions, fetchTopicAndOptions } from './topicAPI';
+import {
+  fetchMoreOptions,
+  fetchTopicAndOptions,
+  fetchUserVotes,
+  setUserDownvote,
+  setUserUpvote,
+} from './topicAPI';
 
 export interface TopicState {
   topicData: {
@@ -17,6 +23,10 @@ export interface TopicState {
     rank: number;
     link?: string;
   }[];
+  userVotes: {
+    upvotes: number[];
+    downvotes: number[];
+  };
   status: 'idle' | 'loading' | 'failed';
   offset: number;
 }
@@ -30,6 +40,7 @@ const initialState: TopicState = {
   optionsData: [],
   status: 'idle',
   offset: 0,
+  userVotes: { upvotes: [], downvotes: [] },
 };
 
 export const topicAndOptionsAsync = createAsyncThunk(
@@ -49,6 +60,31 @@ export const moreOptionsAsync = createAsyncThunk(
   }
 );
 
+export const userVotesAsync = createAsyncThunk(
+  'topic/fetchUserVotes',
+  async (payload: { topicId: string; offset: number }) => {
+    const response = await fetchUserVotes(payload.topicId, payload.offset);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+  }
+);
+export const userDownvoteAsync = createAsyncThunk(
+  'topic/setUserDownvote',
+  async (optionId: number) => {
+    const response = await setUserDownvote(optionId);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+  }
+);
+export const userUpvoteAsync = createAsyncThunk(
+  'topic/setUserUpvote',
+  async (optionId: number) => {
+    const response = await setUserUpvote(optionId);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+  }
+);
+
 export const topicSlice = createSlice({
   name: 'topic',
   initialState,
@@ -61,9 +97,59 @@ export const topicSlice = createSlice({
       })
       .addCase(topicAndOptionsAsync.fulfilled, (state, action) => {
         state.status = 'idle';
-        console.log(action.payload);
         state.topicData = action.payload.topic;
         state.optionsData = action.payload.options;
+      })
+      .addCase(userVotesAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(userVotesAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.userVotes = action.payload;
+      })
+      .addCase(userDownvoteAsync.pending, (state, { meta }) => {
+        state.status = 'loading';
+        if (state.userVotes.upvotes.includes(meta.arg)) {
+          state.userVotes.upvotes = state.userVotes.upvotes.filter(
+            (id) => id !== meta.arg
+          );
+          let _option = state.optionsData.find(
+            (option) => option.optionId === meta.arg
+          );
+          if (_option) _option.upvotes -= 1;
+        }
+        if (!state.userVotes.downvotes.includes(meta.arg)) {
+          state.userVotes.downvotes.push(meta.arg);
+          let _option = state.optionsData.find(
+            (option) => option.optionId === meta.arg
+          );
+          if (_option) _option.downvotes += 1;
+        }
+      })
+      .addCase(userDownvoteAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+      })
+      .addCase(userUpvoteAsync.pending, (state, { meta }) => {
+        state.status = 'loading';
+        if (state.userVotes.downvotes.includes(meta.arg)) {
+          state.userVotes.downvotes = state.userVotes.downvotes.filter(
+            (id) => id !== meta.arg
+          );
+          let _option = state.optionsData.find(
+            (option) => option.optionId === meta.arg
+          );
+          if (_option) _option.downvotes -= 1;
+        }
+        if (!state.userVotes.upvotes.includes(meta.arg)) {
+          state.userVotes.upvotes.push(meta.arg);
+          let _option = state.optionsData.find(
+            (option) => option.optionId === meta.arg
+          );
+          if (_option) _option.upvotes += 1;
+        }
+      })
+      .addCase(userUpvoteAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
       });
   },
 });
@@ -75,5 +161,7 @@ export const selectTopicAndOptions = (state: RootState) =>
   state.topic.topicData;
 
 export const selectMoreOptions = (state: RootState) => state.topic.optionsData;
+
+export const userVotes = (state: RootState) => state.topic.userVotes;
 
 export default topicSlice.reducer;

@@ -7,8 +7,8 @@ export function fetchFilterTopics(filterText: string) {
           data: [
             {
               topicId: 'beach',
-              topicTextGeneric: 'What to bring to',
-              topicText: 'the beach',
+              topicTextGeneric: 'What to bring',
+              topicText: 'to the beach',
             },
             {
               topicId: 'surfing',
