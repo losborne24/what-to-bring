@@ -51,9 +51,11 @@ export function Topic(props: any) {
           </div>
         </div>
         <div className={styles.heading}>
-          <Typography variant="h2">
-            {topicData?.topicTextGeneric} {topicData?.topicText}?
-          </Typography>
+          {topicData?.topicTextGeneric && (
+            <Typography variant="h2">
+              {topicData.topicTextGeneric} {topicData.topicText}?
+            </Typography>
+          )}
         </div>
         <div className={styles.contentsContainer}>
           <div className={styles.optionListContainer}>
