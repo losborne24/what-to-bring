@@ -15,6 +15,7 @@ import styles from './Topic.module.scss';
 import { TopicSearch } from '../../../features/TopicSearch/TopicSearch';
 import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { AuthButton } from '../../../features/AuthButton/AuthButton';
+import { Auth } from 'aws-amplify';
 
 const CssIconButton = styled(IconButton)({
   backgroundColor: '#ffcb77',
@@ -46,7 +47,7 @@ export function Topic(props: any) {
             </Typography>
             <TopicSearch />
           </div>
-          <div>
+          <div className={styles.authButton}>
             <AuthButton user={props.user} />
           </div>
         </div>
@@ -74,7 +75,9 @@ export function Topic(props: any) {
                           <IconButton
                             color="inherit"
                             onClick={() => {
-                              dispatch(userUpvoteAsync(options.optionId));
+                              props.user
+                                ? dispatch(userUpvoteAsync(options.optionId))
+                                : Auth.federatedSignIn();
                             }}
                           >
                             <ArrowUpward fontSize="inherit" />
@@ -93,7 +96,9 @@ export function Topic(props: any) {
                           <IconButton
                             color="inherit"
                             onClick={() => {
-                              dispatch(userDownvoteAsync(options.optionId));
+                              props.user
+                                ? dispatch(userDownvoteAsync(options.optionId))
+                                : Auth.federatedSignIn();
                             }}
                           >
                             <ArrowDownward fontSize="inherit" />

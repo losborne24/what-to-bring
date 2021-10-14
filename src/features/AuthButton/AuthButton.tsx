@@ -33,17 +33,6 @@ export function AuthButton(props: any) {
       {props.user ? (
         <div className={styles.loggedInContainer}>
           {' '}
-          {/* <Typography variant="body2" className={styles.txtEmail}>
-            {props.user?.attributes?.email}{' '}
-          </Typography>
-          <Button
-            color="inherit"
-            variant="outlined"
-            onClick={() => Auth.signOut()}
-          >
-            <Typography variant="button">Sign Out </Typography>{' '}
-          </Button>
-          */}
           <CssIconButton
             color="inherit"
             className={styles.button}
