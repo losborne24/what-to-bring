@@ -29,6 +29,7 @@ export interface TopicState {
   };
   status: 'idle' | 'loading' | 'failed';
   offset: number;
+  total: number;
 }
 
 const initialState: TopicState = {
@@ -40,6 +41,7 @@ const initialState: TopicState = {
   optionsData: [],
   status: 'idle',
   offset: 0,
+  total: 0,
   userVotes: { upvotes: [], downvotes: [] },
 };
 
@@ -99,6 +101,17 @@ export const topicSlice = createSlice({
         state.status = 'idle';
         state.topicData = action.payload.topic;
         state.optionsData = action.payload.options;
+        state.total = action.payload.total;
+        state.offset += 20;
+      })
+      .addCase(moreOptionsAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(moreOptionsAsync.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.optionsData.push.apply(state.optionsData, action.payload.options);
+        state.total = action.payload.total;
+        state.offset += 20;
       })
       .addCase(userVotesAsync.pending, (state) => {
         state.status = 'loading';
@@ -185,11 +198,11 @@ export const topicSlice = createSlice({
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state: RootState) => state.topic.value)`
-export const selectTopicAndOptions = (state: RootState) =>
-  state.topic.topicData;
+export const selectTopic = (state: RootState) => state.topic.topicData;
+export const selectOptions = (state: RootState) => state.topic.optionsData;
+export const selectTotal = (state: RootState) => state.topic.total;
+export const selectOffset = (state: RootState) => state.topic.offset;
 
-export const selectMoreOptions = (state: RootState) => state.topic.optionsData;
-
-export const userVotes = (state: RootState) => state.topic.userVotes;
+export const selectUserVotes = (state: RootState) => state.topic.userVotes;
 
 export default topicSlice.reducer;

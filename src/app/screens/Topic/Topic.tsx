@@ -1,21 +1,25 @@
 import { IconButton, Button, Typography, Link, styled } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import {
-  selectMoreOptions,
-  selectTopicAndOptions,
+  selectOptions,
+  selectTopic,
   topicAndOptionsAsync,
-  userVotes,
+  selectUserVotes,
   userVotesAsync,
   userDownvoteAsync,
   userUpvoteAsync,
+  selectTotal,
+  selectOffset,
+  moreOptionsAsync,
 } from './topicSlice';
 import styles from './Topic.module.scss';
 import { TopicSearch } from '../../../features/TopicSearch/TopicSearch';
 import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { AuthButton } from '../../../features/AuthButton/AuthButton';
 import { Auth } from 'aws-amplify';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const CssIconButton = styled(IconButton)({
   backgroundColor: '#ffcb77',
@@ -25,21 +29,35 @@ const CssIconButton = styled(IconButton)({
 export function Topic(props: any) {
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const topicData = useAppSelector(selectTopicAndOptions);
-  const optionsData = useAppSelector(selectMoreOptions);
-  const userVotesData = useAppSelector(userVotes);
+  const topicData = useAppSelector(selectTopic);
+  const optionsData = useAppSelector(selectOptions);
+  const userVotesData = useAppSelector(selectUserVotes);
+  const totalOptions = useAppSelector(selectTotal);
+  const offset = useAppSelector(selectOffset);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchMoreData = () => {
+    if (offset > totalOptions) {
+      setHasMore(false);
+      return;
+    }
+    dispatch(
+      moreOptionsAsync({ topicId: location.pathname.substr(1), offset: offset })
+    );
+  };
 
   useEffect(() => {
     dispatch(topicAndOptionsAsync(location.pathname.substr(1)));
     if (props.user) {
       dispatch(
-        userVotesAsync({ topicId: location.pathname.substr(1), offset: 0 })
+        userVotesAsync({ topicId: location.pathname.substr(1), offset: offset })
       );
     }
   }, []);
+
   return (
     <div>
-      <div className={styles.container}>
+      <div className={styles.container} id="container">
         <div className={styles.navContainer}>
           <div className={styles.topicSearchContainer}>
             <Typography variant="h5" className={styles.txtWhatToBring}>
@@ -60,73 +78,93 @@ export function Topic(props: any) {
         </div>
         <div className={styles.contentsContainer}>
           <div className={styles.optionListContainer}>
-            {optionsData?.map((options, i) => {
-              return (
-                <div className={styles.optionContainer} key={options.optionId}>
-                  <div className={styles.innerOptionsContainer}>
-                    <Typography variant="h3">{i + 1}.</Typography>
-                    <div className={styles.voteContainer}>
-                      <div className={styles.upvotesContainer}>
-                        {userVotesData.upvotes?.includes(options.optionId) ? (
-                          <CssIconButton color="inherit">
-                            <ArrowUpward fontSize="inherit" />
-                          </CssIconButton>
-                        ) : (
-                          <IconButton
-                            color="inherit"
-                            onClick={() => {
-                              props.user
-                                ? dispatch(userUpvoteAsync(options.optionId))
-                                : Auth.federatedSignIn();
-                            }}
-                          >
-                            <ArrowUpward fontSize="inherit" />
-                          </IconButton>
-                        )}
-                        <Typography variant="body2">
-                          {options.upvotes}
-                        </Typography>
+            <InfiniteScroll
+              dataLength={offset}
+              next={fetchMoreData}
+              hasMore={hasMore}
+              loader={<h4>Loading...</h4>}
+              endMessage={
+                <p style={{ textAlign: 'center' }}>
+                  <b>Fin.</b>
+                </p>
+              }
+              scrollableTarget="container"
+            >
+              {optionsData?.map((options, i) => {
+                return (
+                  <div
+                    className={styles.optionContainer}
+                    key={options.optionId + '+' + i}
+                  >
+                    <div className={styles.innerOptionsContainer}>
+                      <Typography variant="h3">{i + 1}.</Typography>
+                      <div className={styles.voteContainer}>
+                        <div className={styles.upvotesContainer}>
+                          {userVotesData.upvotes?.includes(options.optionId) ? (
+                            <CssIconButton color="inherit">
+                              <ArrowUpward fontSize="inherit" />
+                            </CssIconButton>
+                          ) : (
+                            <IconButton
+                              color="inherit"
+                              onClick={() => {
+                                props.user
+                                  ? dispatch(userUpvoteAsync(options.optionId))
+                                  : Auth.federatedSignIn();
+                              }}
+                            >
+                              <ArrowUpward fontSize="inherit" />
+                            </IconButton>
+                          )}
+                          <Typography variant="body2">
+                            {options.upvotes}
+                          </Typography>
+                        </div>
+                        <div className={styles.downvotesContainer}>
+                          {userVotesData.downvotes?.includes(
+                            options.optionId
+                          ) ? (
+                            <CssIconButton color="inherit">
+                              <ArrowDownward fontSize="inherit" />
+                            </CssIconButton>
+                          ) : (
+                            <IconButton
+                              color="inherit"
+                              onClick={() => {
+                                props.user
+                                  ? dispatch(
+                                      userDownvoteAsync(options.optionId)
+                                    )
+                                  : Auth.federatedSignIn();
+                              }}
+                            >
+                              <ArrowDownward fontSize="inherit" />
+                            </IconButton>
+                          )}
+                          <Typography variant="body2">
+                            {options.downvotes}
+                          </Typography>
+                        </div>
                       </div>
-                      <div className={styles.downvotesContainer}>
-                        {userVotesData.downvotes?.includes(options.optionId) ? (
-                          <CssIconButton color="inherit">
-                            <ArrowDownward fontSize="inherit" />
-                          </CssIconButton>
-                        ) : (
-                          <IconButton
-                            color="inherit"
-                            onClick={() => {
-                              props.user
-                                ? dispatch(userDownvoteAsync(options.optionId))
-                                : Auth.federatedSignIn();
-                            }}
-                          >
-                            <ArrowDownward fontSize="inherit" />
-                          </IconButton>
-                        )}
-                        <Typography variant="body2">
-                          {options.downvotes}
-                        </Typography>
-                      </div>
+                      <Typography variant="body1">
+                        {options.optionText}
+                      </Typography>
                     </div>
-                    <Typography variant="body1">
-                      {options.optionText}
-                    </Typography>
-                  </div>
 
-                  {options.link && (
-                    <Link
-                      href="#"
-                      underline="none"
-                      color="white"
-                      className={styles.linkAmazon}
-                    >
-                      <Typography variant="body2">SHOP NOW</Typography>
-                    </Link>
-                  )}
-                </div>
-              );
-            })}
+                    {options.link && (
+                      <Link
+                        href="#"
+                        underline="none"
+                        color="white"
+                        className={styles.linkAmazon}
+                      >
+                        <Typography variant="body2">SHOP NOW</Typography>
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </InfiniteScroll>
           </div>
         </div>
       </div>
