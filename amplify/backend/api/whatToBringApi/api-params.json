@@ -1,0 +1,83 @@
+{
+  "paths": [
+    {
+      "name": "/topic",
+      "lambdaFunction": "wtbTopicLambda",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/topic"
+    },
+    {
+      "name": "/option",
+      "lambdaFunction": "wtbOptionLambda",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/option"
+    },
+    {
+      "name": "/vote",
+      "lambdaFunction": "wtbVoteLambda",
+      "privacy": {
+        "protected": true,
+        "auth": [
+          "/POST",
+          "/GET",
+          "/PUT",
+          "/PATCH",
+          "/DELETE"
+        ],
+        "unauth": [
+          "/GET"
+        ]
+      },
+      "policyResourceName": "/vote"
+    }
+  ],
+  "resourceName": "whatToBringApi",
+  "apiName": "whatToBringApi",
+  "functionArns": [
+    {
+      "lambdaFunction": "wtbTopicLambda"
+    },
+    {
+      "lambdaFunction": "wtbOptionLambda"
+    },
+    {
+      "lambdaFunction": "wtbVoteLambda"
+    }
+  ],
+  "privacy": {
+    "auth": 1,
+    "unauth": 1,
+    "authRoleName": "amplify-whattobring-dev-142706-authRole",
+    "unAuthRoleName": "amplify-whattobring-dev-142706-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "wtbTopicLambda",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    },
+    {
+      "category": "function",
+      "resourceName": "wtbOptionLambda",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    },
+    {
+      "category": "function",
+      "resourceName": "wtbVoteLambda",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    }
+  ]
+}

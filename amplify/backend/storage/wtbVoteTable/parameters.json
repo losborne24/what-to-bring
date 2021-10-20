@@ -1,0 +1,7 @@
+{
+    "tableName": "wtbVoteTable",
+    "partitionKeyName": "userId",
+    "partitionKeyType": "S",
+    "sortKeyName": "topicId",
+    "sortKeyType": "S"
+}
