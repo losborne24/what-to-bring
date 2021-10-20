@@ -1,7 +1,5 @@
 {
     "tableName": "wtbTopicTable",
     "partitionKeyName": "topicId",
-    "partitionKeyType": "S",
-    "sortKeyName": "topicText",
-    "sortKeyType": "S"
+    "partitionKeyType": "S"
 }

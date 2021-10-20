@@ -27,10 +27,6 @@
     }
   },
   "storage": {
-    "wtbTopicTable": {
-      "service": "DynamoDB",
-      "providerPlugin": "awscloudformation"
-    },
     "wtbOptionTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
@@ -38,28 +34,13 @@
     "wtbVoteTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
+    },
+    "wtbTopicTable": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
     }
   },
   "function": {
-    "wtbTopicLambda": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "storage",
-          "resourceName": "wtbTopicTable",
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "attributeEnvMap": {
-            "Name": "TABLE_NAME",
-            "Arn": "TABLE_ARN"
-          }
-        }
-      ]
-    },
     "wtbOptionLambda": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -97,6 +78,25 @@
           }
         }
       ]
+    },
+    "wtbTopicLambda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "wtbTopicTable",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        }
+      ]
     }
   },
   "api": {
@@ -104,14 +104,6 @@
       "service": "API Gateway",
       "providerPlugin": "awscloudformation",
       "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "wtbTopicLambda",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
         {
           "category": "function",
           "resourceName": "wtbOptionLambda",
@@ -123,6 +115,14 @@
         {
           "category": "function",
           "resourceName": "wtbVoteLambda",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "wtbTopicLambda",
           "attributes": [
             "Name",
             "Arn"
