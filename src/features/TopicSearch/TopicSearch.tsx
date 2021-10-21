@@ -38,7 +38,6 @@ export function TopicSearch() {
     <Autocomplete
       value={value}
       onChange={(event: any, newValue: any) => {
-        setValue(newValue);
         if (newValue) {
           history.push(`/${newValue.topicId}`);
         }

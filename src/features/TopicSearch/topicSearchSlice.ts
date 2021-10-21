@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
 import { fetchFilterTopics } from './topicSearchAPI';
-
+import { API } from 'aws-amplify';
 export interface TopicSearchState {
   filterTopics: {
     topicId: string;
@@ -19,9 +19,10 @@ const initialState: TopicSearchState = {
 export const filterTopicAsync = createAsyncThunk(
   'topicSearch/fetchFilterTopics',
   async (topicId: string) => {
-    const response = await fetchFilterTopics(topicId);
-    // The value we return becomes the `fulfilled` action payload
-    return response.data;
+    const response = await API.get('whatToBringApi', '/topic/filter', {
+      queryStringParameters: { filterText: topicId },
+    });
+    return response;
   }
 );
 
