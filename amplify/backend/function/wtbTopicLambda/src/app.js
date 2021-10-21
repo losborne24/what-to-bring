@@ -35,7 +35,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.get(path + hashKeyPath, function (req, res) {
+app.get(path + '/object' + hashKeyPath, function (req, res) {
   let queryParams = {
     TableName: tableName,
     Key: {
@@ -48,6 +48,24 @@ app.get(path + hashKeyPath, function (req, res) {
       res.json({ error: 'Could not load items: ' + err });
     } else {
       res.json(data.Item);
+    }
+  });
+});
+
+app.get(path + '/filter', function (req, res) {
+  let queryParams = {
+    TableName: tableName,
+    FilterExpression: 'contains(topicId, :topicId)',
+    ExpressionAttributeValues: {
+      ':topicId': req.query.filterText,
+    },
+  };
+  dynamodb.scan(queryParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({ error: 'Could not load items: ' + err });
+    } else {
+      res.json(data.Items);
     }
   });
 });

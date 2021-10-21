@@ -27,7 +27,7 @@
         },
         "wtbTopicLambda": {
           "deploymentBucketName": "amplify-whattobring-dev-142706-deployment",
-          "s3Key": "amplify-builds/wtbTopicLambda-5047587a624e56337350-build.zip"
+          "s3Key": "amplify-builds/wtbTopicLambda-77515647306539424962-build.zip"
         }
       }
     }
