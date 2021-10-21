@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import {
   selectOptions,
   selectTopic,
-  topicAndOptionsAsync,
+  topicAsync,
   selectUserVotes,
   userVotesAsync,
   userDownvoteAsync,
@@ -47,13 +47,21 @@ export function Topic(props: any) {
   };
 
   useEffect(() => {
-    dispatch(topicAndOptionsAsync(location.pathname.substr(1)));
     if (props.user) {
+      dispatch(topicAsync(location.pathname.substr(1)));
       dispatch(
-        userVotesAsync({ topicId: location.pathname.substr(1), offset: offset })
+        moreOptionsAsync({ topicId: location.pathname.substr(1), offset: 0 })
       );
+      if (props.user) {
+        dispatch(
+          userVotesAsync({
+            topicId: location.pathname.substr(1),
+            offset: offset,
+          })
+        );
+      }
     }
-  }, []);
+  }, [props.user]);
 
   return (
     <div>
@@ -70,9 +78,9 @@ export function Topic(props: any) {
           </div>
         </div>
         <div className={styles.heading}>
-          {topicData?.topicTextGeneric && (
+          {topicData?.topicText && (
             <Typography variant="h2">
-              {topicData.topicTextGeneric} {topicData.topicText}?
+              What to bring {topicData.topicText}?
             </Typography>
           )}
         </div>

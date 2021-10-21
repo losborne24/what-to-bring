@@ -55,9 +55,9 @@ app.get(path + '/object' + hashKeyPath, function (req, res) {
 app.get(path + '/filter', function (req, res) {
   let queryParams = {
     TableName: tableName,
-    FilterExpression: 'contains(topicId, :topicId)',
+    FilterExpression: 'contains(topicText, :topicText)',
     ExpressionAttributeValues: {
-      ':topicId': req.query.filterText,
+      ':topicText': req.query.filterText,
     },
   };
   dynamodb.scan(queryParams, (err, data) => {

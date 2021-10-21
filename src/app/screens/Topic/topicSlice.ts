@@ -1,17 +1,11 @@
+import API from '@aws-amplify/api';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../store';
-import {
-  fetchMoreOptions,
-  fetchTopicAndOptions,
-  fetchUserVotes,
-  setUserDownvote,
-  setUserUpvote,
-} from './topicAPI';
+import { fetchUserVotes, setUserDownvote, setUserUpvote } from './topicAPI';
 
 export interface TopicState {
   topicData: {
     topicId: string;
-    topicTextGeneric: string;
     topicText: string;
   };
   optionsData: {
@@ -35,7 +29,6 @@ export interface TopicState {
 const initialState: TopicState = {
   topicData: {
     topicId: '',
-    topicTextGeneric: '',
     topicText: '',
   },
   optionsData: [],
@@ -45,20 +38,33 @@ const initialState: TopicState = {
   userVotes: { upvotes: [], downvotes: [] },
 };
 
-export const topicAndOptionsAsync = createAsyncThunk(
-  'topic/fetchTopicAndOptions',
+export const topicAsync = createAsyncThunk(
+  'topic/fetchTopic',
   async (topicId: string) => {
-    const response = await fetchTopicAndOptions(topicId);
-    // The value we return becomes the `fulfilled` action payload
-    return response.data;
+    const response = await API.get(
+      'whatToBringApi',
+      `/topic/object/${topicId}`,
+      {}
+    );
+    return response;
   }
 );
+
 export const moreOptionsAsync = createAsyncThunk(
   'topic/fetchMoreOptions',
   async (payload: { topicId: string; offset: number }) => {
-    const response = await fetchMoreOptions(payload.topicId, payload.offset);
+    //const response = await fetchMoreOptions(payload.topicId, payload.offset);
     // The value we return becomes the `fulfilled` action payload
-    return response.data;
+    const response = await API.get('whatToBringApi', '/option', {
+      queryStringParameters: {
+        topicId: payload.topicId,
+        offset: payload.offset,
+      },
+    });
+    return {
+      options: response.Items,
+      total: response.Count,
+    };
   }
 );
 
@@ -94,15 +100,12 @@ export const topicSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(topicAndOptionsAsync.pending, (state) => {
+      .addCase(topicAsync.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(topicAndOptionsAsync.fulfilled, (state, action) => {
+      .addCase(topicAsync.fulfilled, (state, action) => {
         state.status = 'idle';
-        state.topicData = action.payload.topic;
-        state.optionsData = action.payload.options;
-        state.total = action.payload.total;
-        state.offset += 20;
+        state.topicData = action.payload;
       })
       .addCase(moreOptionsAsync.pending, (state) => {
         state.status = 'loading';

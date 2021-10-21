@@ -92,31 +92,7 @@
               ]
             }
           ]
-        },
-
-        "GlobalSecondaryIndexes": [
-          {
-            "IndexName": "topicRankGSI",
-            "KeySchema": [
-              {
-                "AttributeName": "topicId",
-                "KeyType": "HASH"
-              },
-
-              {
-                "AttributeName": "rank",
-                "KeyType": "RANGE"
-              }
-            ],
-            "Projection": {
-              "ProjectionType": "ALL"
-            },
-            "ProvisionedThroughput": {
-              "ReadCapacityUnits": "5",
-              "WriteCapacityUnits": "5"
-            }
-          }
-        ]
+        }
       }
     }
   },
