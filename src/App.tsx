@@ -7,7 +7,7 @@ import { Home } from './app/screens/Home/Home';
 import { Topic } from './app/screens/Topic/Topic';
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     Hub.listen('auth', ({ payload: { event, data } }) => {
@@ -20,7 +20,7 @@ function App() {
           });
           break;
         case 'signOut':
-          setUser(null);
+          setUser('');
           break;
         case 'signIn_failure':
         case 'cognitoHostedUI_failure':

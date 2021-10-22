@@ -28,6 +28,15 @@ export function AuthButton(props: any) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const [anchorElUnAuth, setAnchorElUnAuth] =
+    React.useState<null | HTMLElement>(null);
+  const openUnAuth = Boolean(anchorElUnAuth);
+  const handleClickUnAuth = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElUnAuth(event.currentTarget);
+  };
+  const handleCloseUnAuth = () => {
+    setAnchorElUnAuth(null);
+  };
   return (
     <div>
       {props.user ? (
@@ -67,13 +76,35 @@ export function AuthButton(props: any) {
           </Menu>
         </div>
       ) : (
-        <CssIconButton
-          color="inherit"
-          className={styles.button}
-          onClick={() => Auth.federatedSignIn()}
-        >
-          <AccountCircle fontSize="inherit" />
-        </CssIconButton>
+        // <CssIconButton
+        //   color="inherit"
+        //   className={styles.button}
+        //   onClick={() => Auth.federatedSignIn()}
+        // >
+        //   <AccountCircle fontSize="inherit" />
+        // </CssIconButton>
+        <div className={styles.loggedInContainer}>
+          <CssIconButton
+            color="inherit"
+            className={styles.button}
+            onClick={handleClickUnAuth}
+          >
+            <AccountCircle fontSize="inherit" />
+          </CssIconButton>
+          <Menu
+            className={styles.menu}
+            anchorEl={anchorElUnAuth}
+            open={openUnAuth}
+            onClose={handleCloseUnAuth}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <MenuItem onClick={() => Auth.federatedSignIn()}>
+              <Typography variant="body2">Sign In</Typography>
+            </MenuItem>
+          </Menu>
+        </div>
       )}
     </div>
   );

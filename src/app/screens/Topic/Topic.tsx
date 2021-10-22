@@ -47,7 +47,7 @@ export function Topic(props: any) {
   };
 
   useEffect(() => {
-    if (props.user) {
+    if (props.user !== null) {
       dispatch(topicAsync(location.pathname.substr(1)));
       dispatch(
         moreOptionsAsync({ topicId: location.pathname.substr(1), offset: 0 })
