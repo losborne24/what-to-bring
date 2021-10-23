@@ -51,6 +51,22 @@ app.get(path + '/object' + hashKeyPath, function (req, res) {
     }
   });
 });
+app.get(path + '/objectByText' + hashKeyPath, function (req, res) {
+  let queryParams = {
+    TableName: tableName,
+    Key: {
+      topicText: req.params[partitionKeyName],
+    },
+  };
+  dynamodb.get(queryParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({ error: 'Could not load items: ' + err });
+    } else {
+      res.json(data.Item);
+    }
+  });
+});
 
 app.get(path + '/filter', function (req, res) {
   let queryParams = {

@@ -3,7 +3,11 @@ import { TextField, Autocomplete, InputAdornment } from '@mui/material';
 import { useState } from 'react';
 import { alpha, styled } from '@mui/material/styles';
 import styles from './TopicSearch.module.scss';
-import { filterTopicAsync, selectFilterTopics } from './topicSearchSlice';
+import {
+  filterTopicAsync,
+  selectFilterTopics,
+  selectStatus,
+} from './topicSearchSlice';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Redirect, useHistory } from 'react-router';
 
@@ -32,13 +36,25 @@ export function TopicSearch() {
   const [inputValue, setInputValue] = useState('');
   const dispatch = useAppDispatch();
   const filterTopics = useAppSelector(selectFilterTopics);
+  const status = useAppSelector(selectStatus);
   const history = useHistory();
 
   return (
     <Autocomplete
       value={value}
       onChange={(event: any, newValue: any) => {
-        if (newValue) {
+        if (typeof newValue === 'string') {
+          if (status === 'idle') {
+            const topic = filterTopics.find(
+              (topic) => topic.topicText === newValue
+            );
+            if (topic) {
+              history.push(`/${topic.topicId}`);
+            } else {
+              history.push(`/404/${newValue}`);
+            }
+          }
+        } else if (typeof newValue === 'object') {
           history.push(`/${newValue.topicId}`);
         }
       }}
@@ -50,7 +66,7 @@ export function TopicSearch() {
       filterOptions={(options, state) => options}
       freeSolo
       options={filterTopics}
-      getOptionLabel={(option) => option.topicText}
+      getOptionLabel={(option) => option.topicText || option}
       className={styles.autocomplete}
       renderInput={(params) => (
         <CssTextField

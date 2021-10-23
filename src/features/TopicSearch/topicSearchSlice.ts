@@ -49,4 +49,6 @@ export const topicSearchSlice = createSlice({
 export const selectFilterTopics = (state: RootState) =>
   state.topicSearch.filterTopics;
 
+export const selectStatus = (state: RootState) => state.topicSearch.status;
+
 export default topicSearchSlice.reducer;

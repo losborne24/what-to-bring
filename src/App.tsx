@@ -5,6 +5,7 @@ import { Auth, Hub } from 'aws-amplify';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Home } from './app/screens/Home/Home';
 import { Topic } from './app/screens/Topic/Topic';
+import { PageNotFound } from './app/screens/PageNotFound/PageNotFound';
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -44,11 +45,22 @@ function App() {
         <div>
           <Switch>
             <Route
+              path="/404/:topicText"
+              component={(props: any) => (
+                <PageNotFound
+                  {...props}
+                  user={user}
+                  key={window.location.pathname}
+                />
+              )}
+            ></Route>
+            <Route
               path="/:topicId"
               component={(props: any) => (
                 <Topic {...props} user={user} key={window.location.pathname} />
               )}
             ></Route>
+
             <Route path="/">
               <Home user={user} />
             </Route>
