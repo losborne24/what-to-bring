@@ -1,17 +1,16 @@
+.outerContainer {
+  overflow-y: auto;
+  height: 100vh;
+  background-color: #ffcb77;
+  width: 100vw;
+}
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-  top: 0;
-  left: 0;
-  position: absolute;
-  background-color: #ffcb77;
-  z-index: 0;
+  margin-top: 5rem;
 }
-
 .authContainer {
   position: absolute;
   right: 1rem;
@@ -19,12 +18,32 @@
   z-index: 1;
 }
 .heading {
-  padding-bottom: 2rem;
+  padding-bottom: 3rem;
   text-align: center;
 }
 
 .topicSearchContainer {
   display: flex;
   width: 90%;
+  justify-content: center;
+}
+
+.topicContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+.optionContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.topicText {
+  padding-right: 1rem;
+}
+.optionListContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
 }

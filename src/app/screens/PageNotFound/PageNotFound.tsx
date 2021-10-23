@@ -4,9 +4,9 @@ import { Button, styled, Typography } from '@mui/material';
 import { useHistory, useLocation } from 'react-router-dom';
 
 const CssButton = styled(Button)({
-  backgroundColor: 'black',
+  backgroundColor: '#040403',
   marginBottom: '1rem',
-  '&:hover': { backgroundColor: 'black' },
+  '&:hover': { backgroundColor: '#040403' },
 });
 export function PageNotFound(props: any) {
   const history = useHistory();
@@ -20,22 +20,26 @@ export function PageNotFound(props: any) {
         <Typography variant="h1" className={styles.heading}>
           404
         </Typography>
-        <Typography variant="h2" className={styles.heading}>
-          Page Not Found
+        <Typography variant="h3" className={styles.heading}>
+          Sorry, we couldn't find the topic:{' '}
+          <b>{location.pathname.substr(5)}</b>
         </Typography>
+        <CssButton
+          variant="contained"
+          className={styles.button}
+          onClick={() => history.push('/suggest-a-topic')}
+        >
+          Suggest A Topic
+        </CssButton>
+        <Typography variant="body1" className={styles.body}>
+          OR{' '}
+        </Typography>{' '}
         <CssButton
           variant="contained"
           className={styles.button}
           onClick={() => history.push('/')}
         >
           Return Home
-        </CssButton>
-        <CssButton
-          variant="contained"
-          className={styles.button}
-          onClick={() => history.push('/')}
-        >
-          Suggest {location.pathname.substr(5)} as a topic
         </CssButton>
       </div>
     </div>
