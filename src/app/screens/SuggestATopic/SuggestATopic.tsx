@@ -19,13 +19,13 @@ const CssButton = styled(Button)({
 });
 
 const CssTextField = styled(TextField)({
-  '& label.Mui-focused': {
-    color: '#040403',
-  },
-
   '& .MuiOutlinedInput-root': {
     '&.Mui-focused fieldset': {
       borderColor: '#040403',
+      //  background: 'white',
+    },
+    '&.Mui-error fieldset': {
+      borderColor: 'red',
       //  background: 'white',
     },
   },
@@ -47,7 +47,16 @@ const placeHolderOptions = [
 ];
 export function SuggestATopic(props: any) {
   const history = useHistory();
-  const [extraOptions, setExtraOptions] = useState<string[]>([]);
+  const [extraOptionValues, setExtraOptionValues] = useState<string[]>([]);
+  const [optionValues, setOptionValues] = useState<string[]>([
+    '',
+    '',
+    '',
+    '',
+    '',
+  ]);
+  const [topicValue, setTopicValue] = useState<string>('');
+  const [isSubmitTriggered, setSubmitTriggered] = useState<boolean>(false);
 
   return (
     <div className={styles.outerContainer}>
@@ -64,60 +73,72 @@ export function SuggestATopic(props: any) {
           </Typography>
           <CssTextField
             focused
+            error={topicValue === '' && isSubmitTriggered}
             placeholder="to the beach"
             variant="outlined"
             inputProps={{ maxLength: 32 }}
+            onChange={(event) => {
+              setTopicValue(event.target.value);
+            }}
           />
         </div>
       </div>
       <div className={styles.optionListContainer}>
-        {placeHolderOptions.map((option, i) => (
-          <div className={styles.optionContainer} key={`${option}-${i}`}>
+        {optionValues.map((option, i) => (
+          <div className={styles.optionContainer} key={`option-${i}`}>
             <Typography variant="subtitle1" className={styles.optionText}>
               Option {i + 1}:
             </Typography>
             <CssTextField
+              error={option === '' && isSubmitTriggered}
               focused
-              placeholder={option}
               variant="outlined"
               inputProps={{ maxLength: 32 }}
+              placeholder={placeHolderOptions[i]}
+              value={option}
+              onChange={(event) => {
+                const _optionValues = [...optionValues];
+                _optionValues[i] = event.target.value;
+                setOptionValues(_optionValues);
+              }}
             />
             <div className={styles.extraSpacing}></div>
           </div>
         ))}
-        {extraOptions.map((option, i) => (
+        {extraOptionValues.map((option, i) => (
           <div className={styles.optionContainer} key={`extra-option-${i}`}>
             <Typography variant="subtitle1" className={styles.optionText}>
               Option {i + 6}:
             </Typography>
             <CssTextField
+              error={option === '' && isSubmitTriggered}
               focused
               variant="outlined"
               value={option}
               onChange={(event) => {
-                const _extraOptions = [...extraOptions];
+                const _extraOptions = [...extraOptionValues];
                 _extraOptions[i] = event.target.value;
-                setExtraOptions(_extraOptions);
+                setExtraOptionValues(_extraOptions);
               }}
               inputProps={{ maxLength: 32 }}
             />
             <CssIconButton
               color="inherit"
               onClick={() => {
-                const _extraOptions = [...extraOptions];
+                const _extraOptions = [...extraOptionValues];
                 _extraOptions.splice(i, 1);
-                setExtraOptions(_extraOptions);
+                setExtraOptionValues(_extraOptions);
               }}
             >
               <Delete fontSize="inherit" />
             </CssIconButton>
           </div>
         ))}{' '}
-        {extraOptions.length < 10 && (
+        {extraOptionValues.length < 10 && (
           <CssIconButton
             color="inherit"
             onClick={() => {
-              setExtraOptions([...extraOptions, '']);
+              setExtraOptionValues([...extraOptionValues, '']);
             }}
             sx={{
               marginBottom: '1rem',
@@ -129,7 +150,16 @@ export function SuggestATopic(props: any) {
         <CssButton
           variant="contained"
           className={styles.button}
-          onClick={() => history.push('/')}
+          onClick={() => {
+            setSubmitTriggered(true);
+            if (
+              !optionValues.includes('') &&
+              !extraOptionValues.includes('') &&
+              topicValue !== ''
+            ) {
+              history.push('/topic-submitted');
+            }
+          }}
         >
           Submit
         </CssButton>

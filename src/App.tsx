@@ -7,6 +7,7 @@ import { Home } from './app/screens/Home/Home';
 import { Topic } from './app/screens/Topic/Topic';
 import { PageNotFound } from './app/screens/PageNotFound/PageNotFound';
 import { SuggestATopic } from './app/screens/SuggestATopic/SuggestATopic';
+import { TopicSubmitted } from './app/screens/TopicSubmitted/TopicSubmitted';
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -59,6 +60,16 @@ function App() {
               path="/suggest-a-topic"
               component={(props: any) => (
                 <SuggestATopic
+                  {...props}
+                  user={user}
+                  key={window.location.pathname}
+                />
+              )}
+            ></Route>
+            <Route
+              path="/topic-submitted"
+              component={(props: any) => (
+                <TopicSubmitted
                   {...props}
                   user={user}
                   key={window.location.pathname}
