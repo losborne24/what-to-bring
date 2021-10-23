@@ -41,9 +41,17 @@
 .topicText {
   padding-right: 1rem;
 }
+.optionText {
+  padding-right: 1rem;
+  width: 5rem;
+  text-align: end;
+}
 .optionListContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+.extraSpacing {
+  margin-right: 3rem;
 }

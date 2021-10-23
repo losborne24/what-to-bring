@@ -11,6 +11,7 @@ import {
   Divider,
 } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
+import { useHistory } from 'react-router-dom';
 
 const CssIconButton = styled(IconButton)({
   fontSize: 32,
@@ -20,6 +21,8 @@ const CssDivider = styled(Divider)({
 });
 
 export function AuthButton(props: any) {
+  const history = useHistory();
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -66,7 +69,11 @@ export function AuthButton(props: any) {
               </Typography>
             </div>{' '}
             <CssDivider />
-            <MenuItem onClick={handleClose}>
+            <MenuItem
+              onClick={() => {
+                history.push('/suggest-a-topic');
+              }}
+            >
               <Typography variant="body2">Suggest A Topic</Typography>
             </MenuItem>
             <CssDivider />

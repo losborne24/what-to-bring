@@ -2,13 +2,14 @@ import { AuthButton } from '../../../features/AuthButton/AuthButton';
 import styles from './SuggestATopic.module.scss';
 import {
   Button,
+  FormControl,
   IconButton,
   styled,
   TextField,
   Typography,
 } from '@mui/material';
 import { useHistory, useLocation } from 'react-router-dom';
-import { AddCircle } from '@mui/icons-material';
+import { AddCircle, Delete } from '@mui/icons-material';
 import { useState } from 'react';
 
 const CssButton = styled(Button)({
@@ -36,7 +37,6 @@ const CssIconButton = styled(IconButton)({
   backgroundColor: '#ffcb77',
   fontSize: 32,
   '&:hover': { backgroundColor: '#ffcb77' },
-  marginBottom: '1rem',
 });
 const placeHolderOptions = [
   'Sandals',
@@ -47,25 +47,8 @@ const placeHolderOptions = [
 ];
 export function SuggestATopic(props: any) {
   const history = useHistory();
-  const [extraOptionCount, setExtraOptionCount] = useState(0);
-  const extraOptions = () => {
-    const extraOptionsList = [];
-    for (let i = 0; i < extraOptionCount; i++) {
-      extraOptionsList.push(
-        <div className={styles.optionContainer} key={i}>
-          <Typography variant="subtitle1" className={styles.topicText}>
-            Option {i + 6}:
-          </Typography>
-          <CssTextField
-            focused
-            variant="outlined"
-            inputProps={{ maxLength: 32 }}
-          />
-        </div>
-      );
-    }
-    return extraOptionsList;
-  };
+  const [extraOptions, setExtraOptions] = useState<string[]>([]);
+
   return (
     <div className={styles.outerContainer}>
       <div className={styles.authContainer}>
@@ -90,7 +73,7 @@ export function SuggestATopic(props: any) {
       <div className={styles.optionListContainer}>
         {placeHolderOptions.map((option, i) => (
           <div className={styles.optionContainer} key={`${option}-${i}`}>
-            <Typography variant="subtitle1" className={styles.topicText}>
+            <Typography variant="subtitle1" className={styles.optionText}>
               Option {i + 1}:
             </Typography>
             <CssTextField
@@ -99,14 +82,45 @@ export function SuggestATopic(props: any) {
               variant="outlined"
               inputProps={{ maxLength: 32 }}
             />
+            <div className={styles.extraSpacing}></div>
           </div>
         ))}
-        {extraOptions()}
-        {extraOptionCount < 10 && (
+        {extraOptions.map((option, i) => (
+          <div className={styles.optionContainer} key={`extra-option-${i}`}>
+            <Typography variant="subtitle1" className={styles.optionText}>
+              Option {i + 6}:
+            </Typography>
+            <CssTextField
+              focused
+              variant="outlined"
+              value={option}
+              onChange={(event) => {
+                const _extraOptions = [...extraOptions];
+                _extraOptions[i] = event.target.value;
+                setExtraOptions(_extraOptions);
+              }}
+              inputProps={{ maxLength: 32 }}
+            />
+            <CssIconButton
+              color="inherit"
+              onClick={() => {
+                const _extraOptions = [...extraOptions];
+                _extraOptions.splice(i, 1);
+                setExtraOptions(_extraOptions);
+              }}
+            >
+              <Delete fontSize="inherit" />
+            </CssIconButton>
+          </div>
+        ))}{' '}
+        {extraOptions.length < 10 && (
           <CssIconButton
             color="inherit"
             onClick={() => {
-              setExtraOptionCount(extraOptionCount + 1);
+              setExtraOptions([...extraOptions, '']);
+            }}
+            sx={{
+              marginBottom: '1rem',
             }}
           >
             <AddCircle fontSize="inherit" />
