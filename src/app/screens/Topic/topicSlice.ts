@@ -107,14 +107,18 @@ export const topicSlice = createSlice({
         state.status = 'idle';
         state.topicData = action.payload;
       })
-      .addCase(moreOptionsAsync.pending, (state) => {
+      .addCase(moreOptionsAsync.pending, (state, { meta }) => {
         state.status = 'loading';
+        if (meta.arg.offset === 0) {
+          state.offset = 0;
+          state.optionsData = [];
+        }
       })
       .addCase(moreOptionsAsync.fulfilled, (state, action) => {
         state.status = 'idle';
         state.optionsData.push.apply(state.optionsData, action.payload.options);
         state.total = action.payload.total;
-        state.offset += 20;
+        state.offset += 25;
       })
       .addCase(userVotesAsync.pending, (state) => {
         state.status = 'loading';
