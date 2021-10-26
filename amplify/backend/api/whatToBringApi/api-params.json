@@ -9,30 +9,27 @@
             "policyResourceName": "/option"
         },
         {
-            "name": "/vote",
-            "lambdaFunction": "wtbVoteLambda",
-            "privacy": {
-                "protected": true,
-                "auth": [
-                    "/POST",
-                    "/GET",
-                    "/PUT",
-                    "/PATCH",
-                    "/DELETE"
-                ],
-                "unauth": [
-                    "/GET"
-                ]
-            },
-            "policyResourceName": "/vote"
-        },
-        {
             "name": "/topic",
             "lambdaFunction": "wtbTopicLambda",
             "privacy": {
                 "open": true
             },
             "policyResourceName": "/topic"
+        },
+        {
+            "name": "/vote",
+            "lambdaFunction": "wtbVoteLambda",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
+                ]
+            },
+            "policyResourceName": "/vote"
         }
     ],
     "resourceName": "whatToBringApi",
@@ -42,15 +39,15 @@
             "lambdaFunction": "wtbOptionLambda"
         },
         {
-            "lambdaFunction": "wtbVoteLambda"
+            "lambdaFunction": "wtbTopicLambda"
         },
         {
-            "lambdaFunction": "wtbTopicLambda"
+            "lambdaFunction": "wtbVoteLambda"
         }
     ],
     "privacy": {
         "auth": 1,
-        "unauth": 1,
+        "unauth": 0,
         "authRoleName": "amplify-whattobring-dev-142706-authRole",
         "unAuthRoleName": "amplify-whattobring-dev-142706-unauthRole"
     },
@@ -65,7 +62,7 @@
         },
         {
             "category": "function",
-            "resourceName": "wtbVoteLambda",
+            "resourceName": "wtbTopicLambda",
             "attributes": [
                 "Name",
                 "Arn"
@@ -73,12 +70,12 @@
         },
         {
             "category": "function",
-            "resourceName": "wtbTopicLambda",
+            "resourceName": "wtbVoteLambda",
             "attributes": [
                 "Name",
                 "Arn"
             ]
         }
     ],
-    "uuid": "db4f15ac"
+    "uuid": "84cd9713"
 }
