@@ -19,7 +19,7 @@
       "function": {
         "wtbVoteLambda": {
           "deploymentBucketName": "amplify-whattobring-dev-142706-deployment",
-          "s3Key": "amplify-builds/wtbVoteLambda-7872365772466e4d5739-build.zip"
+          "s3Key": "amplify-builds/wtbVoteLambda-56527763634853613430-build.zip"
         },
         "wtbOptionLambda": {
           "deploymentBucketName": "amplify-whattobring-dev-142706-deployment",

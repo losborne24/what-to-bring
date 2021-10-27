@@ -86,13 +86,10 @@ app.post(path + '/downvote', function (req, res) {
   } else {
     const updateItemParams = {
       TableName: tableName,
-      Key: {
+      Item: {
         userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
         topicId: req.body.topicId,
-      },
-      UpdateExpression: 'ADD downvotes :downvote',
-      ExpressionAttributeValues: {
-        ':downvote': dynamodb.createSet([req.body.optionId]),
+        downvotes: dynamodb.createSet([req.body.optionId]),
       },
     };
     dynamodb.put(updateItemParams, (err, data) => {
@@ -114,7 +111,6 @@ const checkIfItemExists = (req) => {
       topicId: req.body.topicId,
     },
   };
-
   let exists = false;
   dynamodb.get(params, (error, result) => {
     if (result.Item) exists = true;
