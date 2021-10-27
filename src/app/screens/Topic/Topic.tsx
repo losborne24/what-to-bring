@@ -141,7 +141,10 @@ export function Topic(props: any) {
                               onClick={() => {
                                 props.user
                                   ? dispatch(
-                                      userDownvoteAsync(options.optionId)
+                                      userDownvoteAsync({
+                                        topicId: topicData.topicId,
+                                        optionId: options.optionId,
+                                      })
                                     )
                                   : Auth.federatedSignIn();
                               }}

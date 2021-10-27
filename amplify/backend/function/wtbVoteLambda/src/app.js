@@ -42,87 +42,86 @@ app.use(function (req, res, next) {
   next();
 });
 
-// convert url string param to expected Type
-const convertUrlType = (param, type) => {
-  switch (type) {
-    case 'N':
-      return Number.parseInt(param);
-    default:
-      return param;
-  }
-};
-
-app.get(path + '/object' + hashKeyPath + sortKeyPath, function (req, res) {
-  var params = {};
-  if (userIdPresent && req.apiGateway) {
-    params[partitionKeyName] =
-      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  } else {
-    params[partitionKeyName] = req.params[partitionKeyName];
-    try {
-      params[partitionKeyName] = convertUrlType(
-        req.params[partitionKeyName],
-        partitionKeyType
-      );
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: 'Wrong column type ' + err });
-    }
-  }
-  if (hasSortKey) {
-    try {
-      params[sortKeyName] = convertUrlType(
-        req.params[sortKeyName],
-        sortKeyType
-      );
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: 'Wrong column type ' + err });
-    }
-  }
-
-  let getItemParams = {
+app.get(path + hashKeyPath, function (req, res) {
+  const queryParams = {
     TableName: tableName,
-    Key: params,
+    Key: {
+      userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
+      topicId: req.params[partitionKeyName],
+    },
   };
-
-  dynamodb.get(getItemParams, (err, data) => {
+  dynamodb.get(queryParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
-      res.json({ error: 'Could not load items: ' + err.message });
+      res.json({ error: 'Could not load items: ' + err });
     } else {
-      if (data.Item) {
-        res.json(data.Item);
+      res.json(data.Item);
+    }
+  });
+});
+
+app.post(path + '/downvote', function (req, res) {
+  const isItemExists = checkIfItemExists(req);
+  if (isItemExists) {
+    const updateItemParams = {
+      TableName: tableName,
+      Key: {
+        userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
+        topicId: req.body.topicId,
+      },
+      UpdateExpression: 'DELETE upvotes :upvote, ADD downvotes :downvote',
+      ExpressionAttributeValues: {
+        ':downvote': dynamodb.createSet([req.body.optionId]),
+        ':upvote': dynamodb.createSet([req.body.optionId]),
+      },
+    };
+    dynamodb.update(updateItemParams, (err, data) => {
+      if (err) {
+        res.statusCode = 500;
+        res.json({ error: err, url: req.url, body: req.body });
       } else {
-        res.json(data);
+        res.json({ success: 'post call succeed!', url: req.url, data: data });
       }
-    }
-  });
-});
-
-/************************************
- * HTTP post method for insert object *
- *************************************/
-
-app.post(path, function (req, res) {
-  if (userIdPresent) {
-    req.body['userId'] =
-      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+    });
+  } else {
+    const updateItemParams = {
+      TableName: tableName,
+      Key: {
+        userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
+        topicId: req.body.topicId,
+      },
+      UpdateExpression: 'ADD downvotes :downvote',
+      ExpressionAttributeValues: {
+        ':downvote': dynamodb.createSet([req.body.optionId]),
+      },
+    };
+    dynamodb.put(updateItemParams, (err, data) => {
+      if (err) {
+        res.statusCode = 500;
+        res.json({ error: err, url: req.url, body: req.body });
+      } else {
+        res.json({ success: 'post call succeed!', url: req.url, data: data });
+      }
+    });
   }
-
-  let putItemParams = {
-    TableName: tableName,
-    Item: req.body,
-  };
-  dynamodb.put(putItemParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: err, url: req.url, body: req.body });
-    } else {
-      res.json({ success: 'post call succeed!', url: req.url, data: data });
-    }
-  });
 });
+
+const checkIfItemExists = (req) => {
+  const params = {
+    TableName: tableName,
+    Key: {
+      userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
+      topicId: req.body.topicId,
+    },
+  };
+
+  let exists = false;
+  dynamodb.get(params, (error, result) => {
+    if (result.Item) exists = true;
+    else exists = false;
+  });
+  return exists;
+};
 
 app.listen(3000, function () {
   console.log('App started');
