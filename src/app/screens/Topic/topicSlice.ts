@@ -71,15 +71,32 @@ export const moreOptionsAsync = createAsyncThunk(
 
 export const userVotesAsync = createAsyncThunk(
   'topic/fetchUserVotes',
-  async (payload: { topicId: string; offset: number }) => {
-    const response = await fetchUserVotes(payload.topicId, payload.offset);
+  async (topicId: string) => {
+    const myInit = {
+      headers: {
+        Authorization: `Bearer ${(await Auth.currentSession())
+          .getIdToken()
+          .getJwtToken()}`,
+      },
+    };
+    const response = await API.get(
+      'whatToBringApi',
+      `/vote/${topicId}`,
+      myInit
+    );
+    // const response = await fetchUserVotes(payload.topicId, payload.offset);
+    // console.log(response);
     // The value we return becomes the `fulfilled` action payload
-    return response.data;
+    return {
+      upvotes: response.upvotes || [],
+      downvotes: response.downvotes || [],
+    };
   }
 );
 export const userDownvoteAsync = createAsyncThunk(
   'topic/setUserDownvote',
   async (payload: { topicId: string; optionId: number }) => {
+    console.log('here');
     const myInit = {
       headers: {
         Authorization: `Bearer ${(await Auth.currentSession())
@@ -93,9 +110,9 @@ export const userDownvoteAsync = createAsyncThunk(
     };
     console.log(myInit);
     const temp = await API.post('whatToBringApi', '/vote/downvote', myInit);
-    const response = await setUserDownvote(payload.optionId);
+    // const response = await setUserDownvote(payload.optionId);
     // The value we return becomes the `fulfilled` action payload
-    return { isChange: response.isChange, optionId: payload.optionId };
+    return { isChange: false, optionId: payload.optionId };
   }
 );
 export const userUpvoteAsync = createAsyncThunk(

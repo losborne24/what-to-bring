@@ -1,3 +1,18 @@
 {
-  "lambdaLayers": []
+  "lambdaLayers": [],
+  "permissions": {
+    "storage": {
+      "wtbOptionTable": [
+        "read",
+        "update",
+        "delete"
+      ],
+      "wtbVoteTable": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  }
 }

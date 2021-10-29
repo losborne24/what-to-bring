@@ -23,6 +23,22 @@
     "storagewtbVoteTableArn": {
       "Type": "String",
       "Default": "storagewtbVoteTableArn"
+    },
+    "storagewtbOptionTableName": {
+      "Type": "String",
+      "Default": "storagewtbOptionTableName"
+    },
+    "storagewtbOptionTableArn": {
+      "Type": "String",
+      "Default": "storagewtbOptionTableArn"
+    },
+    "storagewtbOptionTableStreamArn": {
+      "Type": "String",
+      "Default": "storagewtbOptionTableStreamArn"
+    },
+    "storagewtbVoteTableStreamArn": {
+      "Type": "String",
+      "Default": "storagewtbVoteTableStreamArn"
     }
   },
   "Conditions": {
@@ -77,6 +93,24 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
+            },
+            "STORAGE_WTBOPTIONTABLE_NAME": {
+              "Ref": "storagewtbOptionTableName"
+            },
+            "STORAGE_WTBOPTIONTABLE_ARN": {
+              "Ref": "storagewtbOptionTableArn"
+            },
+            "STORAGE_WTBOPTIONTABLE_STREAMARN": {
+              "Ref": "storagewtbOptionTableStreamArn"
+            },
+            "STORAGE_WTBVOTETABLE_NAME": {
+              "Ref": "storagewtbVoteTableName"
+            },
+            "STORAGE_WTBVOTETABLE_ARN": {
+              "Ref": "storagewtbVoteTableArn"
+            },
+            "STORAGE_WTBVOTETABLE_STREAMARN": {
+              "Ref": "storagewtbVoteTableStreamArn"
             }
           }
         },
@@ -179,6 +213,88 @@
                 "dynamodb:PutItem",
                 "dynamodb:UpdateItem",
                 "dynamodb:DeleteItem"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagewtbVoteTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagewtbVoteTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "AmplifyResourcesPolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*",
+                "dynamodb:Delete*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagewtbOptionTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagewtbOptionTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Put*",
+                "dynamodb:Create*",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*",
+                "dynamodb:Delete*"
               ],
               "Resource": [
                 {

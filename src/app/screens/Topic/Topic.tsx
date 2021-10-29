@@ -53,12 +53,7 @@ export function Topic(props: any) {
         moreOptionsAsync({ topicId: location.pathname.substr(1), offset: 0 })
       );
       if (props.user) {
-        dispatch(
-          userVotesAsync({
-            topicId: location.pathname.substr(1),
-            offset: offset,
-          })
-        );
+        dispatch(userVotesAsync(location.pathname.substr(1)));
       }
     }
   }, [props.user]);
