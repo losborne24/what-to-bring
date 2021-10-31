@@ -84,9 +84,6 @@ export const userVotesAsync = createAsyncThunk(
       `/vote/${topicId}`,
       myInit
     );
-    // const response = await fetchUserVotes(payload.topicId, payload.offset);
-    // console.log(response);
-    // The value we return becomes the `fulfilled` action payload
     return {
       upvotes: response.upvotes || [],
       downvotes: response.downvotes || [],
@@ -96,7 +93,6 @@ export const userVotesAsync = createAsyncThunk(
 export const userDownvoteAsync = createAsyncThunk(
   'topic/setUserDownvote',
   async (payload: { topicId: string; optionId: number }) => {
-    console.log('here');
     const myInit = {
       headers: {
         Authorization: `Bearer ${(await Auth.currentSession())
@@ -108,19 +104,29 @@ export const userDownvoteAsync = createAsyncThunk(
         optionId: payload.optionId,
       },
     };
-    console.log(myInit);
-    const temp = await API.post('whatToBringApi', '/vote/downvote', myInit);
+    const response = await API.post('whatToBringApi', '/vote/downvote', myInit);
     // const response = await setUserDownvote(payload.optionId);
     // The value we return becomes the `fulfilled` action payload
-    return { isChange: false, optionId: payload.optionId };
+    return { isChange: response.data, optionId: payload.optionId };
   }
 );
 export const userUpvoteAsync = createAsyncThunk(
   'topic/setUserUpvote',
-  async (optionId: number) => {
-    const response = await setUserUpvote(optionId);
+  async (payload: { topicId: string; optionId: number }) => {
+    const myInit = {
+      headers: {
+        Authorization: `Bearer ${(await Auth.currentSession())
+          .getIdToken()
+          .getJwtToken()}`,
+      },
+      body: {
+        topicId: payload.topicId,
+        optionId: payload.optionId,
+      },
+    };
+    const response = await API.post('whatToBringApi', '/vote/upvote', myInit);
     // The value we return becomes the `fulfilled` action payload
-    return { isChange: response.isChange, optionId };
+    return { isChange: response.data, optionId: payload.optionId };
   }
 );
 
@@ -196,19 +202,19 @@ export const topicSlice = createSlice({
       })
       .addCase(userUpvoteAsync.pending, (state, { meta }) => {
         state.status = 'loading';
-        if (state.userVotes.downvotes.includes(meta.arg)) {
+        if (state.userVotes.downvotes.includes(meta.arg.optionId)) {
           state.userVotes.downvotes = state.userVotes.downvotes.filter(
-            (id) => id !== meta.arg
+            (id) => id !== meta.arg.optionId
           );
           const _option = state.optionsData.find(
-            (option) => option.optionId === meta.arg
+            (option) => option.optionId === meta.arg.optionId
           );
           if (_option) _option.downvotes -= 1;
         }
-        if (!state.userVotes.upvotes.includes(meta.arg)) {
-          state.userVotes.upvotes.push(meta.arg);
+        if (!state.userVotes.upvotes.includes(meta.arg.optionId)) {
+          state.userVotes.upvotes.push(meta.arg.optionId);
           const _option = state.optionsData.find(
-            (option) => option.optionId === meta.arg
+            (option) => option.optionId === meta.arg.optionId
           );
           if (_option) _option.upvotes += 1;
         }

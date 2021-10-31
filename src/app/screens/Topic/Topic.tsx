@@ -112,7 +112,12 @@ export function Topic(props: any) {
                               color="inherit"
                               onClick={() => {
                                 props.user
-                                  ? dispatch(userUpvoteAsync(options.optionId))
+                                  ? dispatch(
+                                      userUpvoteAsync({
+                                        topicId: topicData.topicId,
+                                        optionId: options.optionId,
+                                      })
+                                    )
                                   : Auth.federatedSignIn();
                               }}
                             >

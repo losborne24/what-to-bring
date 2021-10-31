@@ -72,16 +72,18 @@ app.get(path + sortKeyPath, function (req, res) {
     }
   });
 });
-const updateOptionItemVotes = async (req, path, isSwap) => {
+const updateOptionItemVotes = async (req, voteDirection, isSwap) => {
   let updateExpression;
   if (isSwap) {
     updateExpression =
-      path === 'downvote'
-        ? 'ADD downvotes :amount ADD upvotes :amount'
-        : 'ADD downvotes :amount ADD upvotes :amount';
+      voteDirection === 'DOWN'
+        ? 'ADD downvotes :amount, upvotes :amountN'
+        : 'ADD downvotes :amountN, upvotes :amount';
   } else {
     updateExpression =
-      path === 'downvote' ? 'ADD downvotes :amount' : 'ADD upvotes :amount';
+      voteDirection === 'DOWN'
+        ? 'ADD downvotes :amount'
+        : 'ADD upvotes :amount';
   }
   const updateOptionItemParams = {
     TableName: optionTableName,
@@ -93,6 +95,7 @@ const updateOptionItemVotes = async (req, path, isSwap) => {
     UpdateExpression: updateExpression,
     ExpressionAttributeValues: {
       ':amount': 1,
+      ':amountN': -1,
     },
   };
   return await dynamodb.update(updateOptionItemParams).promise();
@@ -108,7 +111,6 @@ const getOptionRankNeighbour = async (req, optionRank) => {
       ':optionRank': optionRank,
     },
   };
-  console.log({ params });
   return await dynamodb.query(params).promise();
 };
 const checkIfVoteItemExists = async (req) => {
@@ -121,13 +123,12 @@ const checkIfVoteItemExists = async (req) => {
   };
   return await dynamodb.get(params).promise();
 };
-app.post(path + '/downvote', async function (req, res) {
-  const userVoteItem$ = await checkIfVoteItemExists(req);
-  const userVoteItem = userVoteItem$?.Item;
-  console.log({ userVoteItem$, userVoteItem });
-  const isSwap = userVoteItem?.upvotes?.has(req.body.optionId) || false;
-  console.log({ isSwap });
+const updateUserVoteItem = async (req, voteDirection, userVoteItem) => {
   if (userVoteItem) {
+    const _updateExpression =
+      voteDirection === 'DOWN'
+        ? 'DELETE upvotes :upvote ADD downvotes :downvote'
+        : 'ADD upvotes :upvote DELETE downvotes :downvote';
     // update votes table
     const updateItemParams = {
       TableName: tableName,
@@ -135,41 +136,58 @@ app.post(path + '/downvote', async function (req, res) {
         userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
         topicId: req.body.topicId,
       },
-      UpdateExpression: 'DELETE upvotes :upvote ADD downvotes :downvote',
+      UpdateExpression: _updateExpression,
       ExpressionAttributeValues: {
         ':downvote': dynamodb.createSet([req.body.optionId]),
         ':upvote': dynamodb.createSet([req.body.optionId]),
       },
     };
-    await dynamodb.update(updateItemParams).promise();
+    return await dynamodb.update(updateItemParams).promise();
   } else {
     // update votes table
+    const _item =
+      voteDirection === 'DOWN'
+        ? {
+            userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
+            topicId: req.body.topicId,
+            downvotes: dynamodb.createSet([req.body.optionId]),
+          }
+        : {
+            userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
+            topicId: req.body.topicId,
+            upvotes: dynamodb.createSet([req.body.optionId]),
+          };
     const updateItemParams = {
       TableName: tableName,
-      Item: {
-        userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
-        topicId: req.body.topicId,
-        downvotes: dynamodb.createSet([req.body.optionId]),
-      },
+      Item: _item,
     };
-    await dynamodb.put(updateItemParams).promise();
+    return await dynamodb.put(updateItemParams).promise();
   }
-  const optionItem$ = await updateOptionItemVotes(req, 'downvote', isSwap);
-  const optionItem = optionItem$?.Attributes;
-  console.log({ optionItem$, optionItem });
-
-  const optionItemBelow$ = await getOptionRankNeighbour(
+};
+const checkNeighbour = async (req, voteDirection, optionItem) => {
+  const optionRankNeighbourNo =
+    voteDirection === 'DOWN'
+      ? optionItem.optionRank + 1
+      : optionItem.optionRank - 1;
+  const optionItemNeighbour$ = await getOptionRankNeighbour(
     req,
-    optionItem.optionRank + 1
+    optionRankNeighbourNo
   );
-  const optionItemBelow = optionItemBelow$?.Items[0]; // may be null
+  const optionItemNeighbour = optionItemNeighbour$?.Items[0]; // may be null
   let isChangeRank = false;
-  if (optionItemBelow) {
+  if (optionItemNeighbour) {
     const itemCoEff = (optionItem.upvotes * 2) / (optionItem.downvotes + 100);
-    const belowCoEff =
-      (optionItemBelow.upvotes * 2) / (optionItemBelow.downvotes + 100);
-    console.log({ itemCoEff, belowCoEff });
-    if (itemCoEff < belowCoEff) {
+    const neighbourCoEff =
+      (optionItemNeighbour.upvotes * 2) / (optionItemNeighbour.downvotes + 100);
+    console.log({ itemCoEff });
+    console.log({ neighbourCoEff });
+    console.log({ voteDirection });
+
+    if (
+      (voteDirection === 'DOWN' && itemCoEff < neighbourCoEff) ||
+      (voteDirection === 'UP' && itemCoEff > neighbourCoEff)
+    ) {
+      console.log('here');
       isChangeRank = true;
       const updateOptionItemParams = {
         TableName: optionTableName,
@@ -179,110 +197,50 @@ app.post(path + '/downvote', async function (req, res) {
         },
         UpdateExpression: 'ADD optionRank :amount',
         ExpressionAttributeValues: {
-          ':amount': 1,
+          ':amount': voteDirection === 'DOWN' ? 1 : -1,
         },
       };
       await dynamodb.update(updateOptionItemParams).promise();
 
-      const updateOptionItemBelowParams = {
+      const updateOptionItemNeighbourParams = {
         TableName: optionTableName,
         Key: {
-          topicId: optionItemBelow.topicId,
-          optionId: optionItemBelow.optionId,
+          topicId: optionItemNeighbour.topicId,
+          optionId: optionItemNeighbour.optionId,
         },
         UpdateExpression: 'ADD optionRank :amount',
         ExpressionAttributeValues: {
-          ':amount': -1,
+          ':amount': voteDirection === 'DOWN' ? -1 : 1,
         },
       };
-      await dynamodb.update(updateOptionItemBelowParams).promise();
+      await dynamodb.update(updateOptionItemNeighbourParams).promise();
     }
   }
+  return isChangeRank;
+};
+
+const updateVote = async (req, voteDirection) => {
+  const userVoteItem$ = await checkIfVoteItemExists(req);
+  const userVoteItem = userVoteItem$?.Item;
+  const isSwap =
+    voteDirection === 'DOWN'
+      ? userVoteItem?.upvotes?.values.includes(req.body.optionId) || false
+      : userVoteItem?.downvotes?.values.includes(req.body.optionId) || false;
+  await updateUserVoteItem(req, voteDirection, userVoteItem);
+  const optionItem$ = await updateOptionItemVotes(req, voteDirection, isSwap);
+  const optionItem = optionItem$?.Attributes;
+  return await checkNeighbour(req, voteDirection, optionItem);
+};
+app.post(path + '/downvote', async function (req, res) {
+  const voteDirection = 'DOWN';
+  const isChangeRank = await updateVote(req, voteDirection);
   res.json({ data: isChangeRank });
 });
-/*app.post(path + '/downvote', function (req, res) {
-  const userVoteItem = checkIfVoteItemExists(req);
-  console.log({ userVoteItem });
-  const isSwap = userVoteItem?.upvotes?.has(req.body.optionId) || false;
-  console.log({ isSwap });
-  if (userVoteItem) {
-    // update votes table
-    const updateItemParams = {
-      TableName: tableName,
-      Key: {
-        userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
-        topicId: req.body.topicId,
-      },
-      UpdateExpression: 'DELETE upvotes :upvote ADD downvotes :downvote',
-      ExpressionAttributeValues: {
-        ':downvote': dynamodb.createSet([req.body.optionId]),
-        ':upvote': dynamodb.createSet([req.body.optionId]),
-      },
-    };
-    dynamodb.update(updateItemParams, (err, data) => {
-      console.log({ updateItem: data });
-    });
-  } else {
-    // update votes table
-    const updateItemParams = {
-      TableName: tableName,
-      Item: {
-        userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
-        topicId: req.body.topicId,
-        downvotes: dynamodb.createSet([req.body.optionId]),
-      },
-    };
-    dynamodb.put(updateItemParams, (err, data) => {
-      console.log({ updateItemV2: data });
-    });
-  }
-
-  const optionItem = updateOptionItemVotes(req, 'downvote', isSwap);
-  console.log({ optionItem });
-
-  const optionItemBelow = getOptionRankNeighbour(
-    req,
-    optionItem.optionRank + 1
-  ); // may be null
-  console.log({ optionItemBelow });
-
-  let isChangeRank = false;
-  if (optionItemBelow) {
-    const itemCoEff = (optionItem.upvotes * 2) / (optionItem + 100);
-    const belowCoEff = (optionItemBelow.upvotes * 2) / (optionItemBelow + 100);
-    console.log({ itemCoEff, belowCoEff });
-    if (itemCoEff < belowCoEff) {
-      isChangeRank = true;
-      const updateOptionItemParams = {
-        TableName: optionTableName,
-        Key: {
-          topicId: optionItem.topicId,
-          optionId: optionItem.optionId,
-        },
-        UpdateExpression: 'SET optionRank = optionRank + :r',
-        ExpressionAttributeValues: {
-          ':r': { N: '1' },
-        },
-      };
-      dynamodb.update(updateOptionItemParams, (err, data) => {});
-
-      const updateOptionItemBelowParams = {
-        TableName: optionTableName,
-        Key: {
-          topicId: optionItemBelow.topicId,
-          optionId: optionItemBelow.optionId,
-        },
-        UpdateExpression: 'SET optionRank = optionRank - :r',
-        ExpressionAttributeValues: {
-          ':r': { N: '1' },
-        },
-      };
-      dynamodb.update(updateOptionItemBelowParams, (err, data) => {});
-    }
-    res.json({ data: isChangeRank });
-  }
+app.post(path + '/upvote', async function (req, res) {
+  const voteDirection = 'UP';
+  const isChangeRank = await updateVote(req, voteDirection);
+  res.json({ data: isChangeRank });
 });
-*/
 
 app.listen(3000, function () {
   console.log('App started');
