@@ -74,16 +74,24 @@ app.get(path + sortKeyPath, function (req, res) {
 });
 const updateOptionItemVotes = async (req, voteDirection, isSwap) => {
   let updateExpression;
+  let expressionAttributeValues;
   if (isSwap) {
     updateExpression =
       voteDirection === 'DOWN'
         ? 'ADD downvotes :amount, upvotes :amountN'
         : 'ADD downvotes :amountN, upvotes :amount';
+    expressionAttributeValues = {
+      ':amount': 1,
+      ':amountN': -1,
+    };
   } else {
     updateExpression =
       voteDirection === 'DOWN'
         ? 'ADD downvotes :amount'
         : 'ADD upvotes :amount';
+    expressionAttributeValues = {
+      ':amount': 1,
+    };
   }
   const updateOptionItemParams = {
     TableName: optionTableName,
@@ -93,10 +101,7 @@ const updateOptionItemVotes = async (req, voteDirection, isSwap) => {
     },
     ReturnValues: 'ALL_NEW',
     UpdateExpression: updateExpression,
-    ExpressionAttributeValues: {
-      ':amount': 1,
-      ':amountN': -1,
-    },
+    ExpressionAttributeValues: expressionAttributeValues,
   };
   return await dynamodb.update(updateOptionItemParams).promise();
 };
