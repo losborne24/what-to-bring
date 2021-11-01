@@ -45,8 +45,9 @@ app.use(function (req, res, next) {
 app.get(path, function (req, res) {
   let queryParams = {
     TableName: tableName,
-    FilterExpression: 'optionRank between :lower and :upper',
-    KeyConditionExpression: 'topicId = :topicId',
+    IndexName: 'topicId-optionRank-index',
+    KeyConditionExpression:
+      'topicId = :topicId AND optionRank between :lower and :upper',
     ExpressionAttributeValues: {
       ':topicId': req.query.topicId,
       ':lower': parseInt(req.query.offset) + 1,

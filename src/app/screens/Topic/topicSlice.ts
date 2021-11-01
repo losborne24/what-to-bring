@@ -248,5 +248,6 @@ export const selectTotal = (state: RootState) => state.topic.total;
 export const selectOffset = (state: RootState) => state.topic.offset;
 
 export const selectUserVotes = (state: RootState) => state.topic.userVotes;
+export const selectStatus = (state: RootState) => state.topic.status;
 
 export default topicSlice.reducer;

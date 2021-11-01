@@ -174,6 +174,7 @@ const checkNeighbour = async (req, voteDirection, optionItem) => {
     optionRankNeighbourNo
   );
   const optionItemNeighbour = optionItemNeighbour$?.Items[0]; // may be null
+
   let isChangeRank = false;
   if (optionItemNeighbour) {
     const itemCoEff = (optionItem.upvotes * 2) / (optionItem.downvotes + 100);
@@ -181,7 +182,6 @@ const checkNeighbour = async (req, voteDirection, optionItem) => {
       (optionItemNeighbour.upvotes * 2) / (optionItemNeighbour.downvotes + 100);
     console.log({ itemCoEff });
     console.log({ neighbourCoEff });
-    console.log({ voteDirection });
 
     if (
       (voteDirection === 'DOWN' && itemCoEff < neighbourCoEff) ||

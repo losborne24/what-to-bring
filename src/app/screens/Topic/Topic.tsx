@@ -20,6 +20,7 @@ import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { AuthButton } from '../../../features/AuthButton/AuthButton';
 import { Auth } from 'aws-amplify';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { selectStatus } from '../../../features/TopicSearch/topicSearchSlice';
 
 const CssIconButton = styled(IconButton)({
   backgroundColor: '#ffcb77',
@@ -33,6 +34,7 @@ export function Topic(props: any) {
   const optionsData = useAppSelector(selectOptions);
   const userVotesData = useAppSelector(selectUserVotes);
   const totalOptions = useAppSelector(selectTotal);
+  const status = useAppSelector(selectStatus);
   const offset = useAppSelector(selectOffset);
   const [hasMore, setHasMore] = useState(true);
 
@@ -109,6 +111,7 @@ export function Topic(props: any) {
                             </CssIconButton>
                           ) : (
                             <IconButton
+                              disabled={status === 'loading'}
                               color="inherit"
                               onClick={() => {
                                 props.user
@@ -137,6 +140,7 @@ export function Topic(props: any) {
                             </CssIconButton>
                           ) : (
                             <IconButton
+                              disabled={status === 'loading'}
                               color="inherit"
                               onClick={() => {
                                 props.user
