@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Counter } from './features/counter/Counter';
 import './App.scss';
 import { Auth, Hub } from 'aws-amplify';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom';
 import { Home } from './app/screens/Home/Home';
 import { Topic } from './app/screens/Topic/Topic';
 import { PageNotFound } from './app/screens/PageNotFound/PageNotFound';
@@ -58,23 +63,31 @@ function App() {
             ></Route>
             <Route
               path="/suggest-a-topic"
-              component={(props: any) => (
-                <SuggestATopic
-                  {...props}
-                  user={user}
-                  key={window.location.pathname}
-                />
-              )}
+              component={(props: any) =>
+                user ? (
+                  <SuggestATopic
+                    {...props}
+                    user={user}
+                    key={window.location.pathname}
+                  />
+                ) : (
+                  <Redirect to="/" />
+                )
+              }
             ></Route>
             <Route
               path="/topic-submitted"
-              component={(props: any) => (
-                <TopicSubmitted
-                  {...props}
-                  user={user}
-                  key={window.location.pathname}
-                />
-              )}
+              component={(props: any) =>
+                user ? (
+                  <TopicSubmitted
+                    {...props}
+                    user={user}
+                    key={window.location.pathname}
+                  />
+                ) : (
+                  <Redirect to="/" />
+                )
+              }
             ></Route>
             <Route
               path="/:topicId"

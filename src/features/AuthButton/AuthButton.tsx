@@ -83,13 +83,6 @@ export function AuthButton(props: any) {
           </Menu>
         </div>
       ) : (
-        // <CssIconButton
-        //   color="inherit"
-        //   className={styles.button}
-        //   onClick={() => Auth.federatedSignIn()}
-        // >
-        //   <AccountCircle fontSize="inherit" />
-        // </CssIconButton>
         <div className={styles.loggedInContainer}>
           <CssIconButton
             color="inherit"

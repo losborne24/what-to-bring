@@ -1,4 +1,11 @@
-import { IconButton, Button, Typography, Link, styled } from '@mui/material';
+import {
+  IconButton,
+  Button,
+  Typography,
+  Link,
+  styled,
+  TextField,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -18,14 +25,32 @@ import styles from './Topic.module.scss';
 import { TopicSearch } from '../../../features/TopicSearch/TopicSearch';
 import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { AuthButton } from '../../../features/AuthButton/AuthButton';
-import { Auth } from 'aws-amplify';
+import { API, Auth } from 'aws-amplify';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 const CssIconButton = styled(IconButton)({
   backgroundColor: '#ffcb77',
   '&:hover': { backgroundColor: '#ffcb77' },
 });
-
+const CssTextField = styled(TextField)({
+  '& .MuiOutlinedInput-root': {
+    '&.Mui-focused fieldset': {
+      borderColor: '#040403',
+      //  background: 'white',
+    },
+    '&.Mui-error fieldset': {
+      borderColor: 'red',
+      //  background: 'white',
+    },
+  },
+  '& .MuiInputBase-root': {
+    color: '#040403',
+  },
+});
+const CssButton = styled(Button)({
+  backgroundColor: '#040403',
+  '&:hover': { backgroundColor: '#040403' },
+});
 export function Topic(props: any) {
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -35,6 +60,7 @@ export function Topic(props: any) {
   const totalOptions = useAppSelector(selectTotal);
   const offset = useAppSelector(selectOffset);
   const [hasMore, setHasMore] = useState(true);
+  const [suggestOptionText, setSuggestOptionText] = useState('');
 
   const fetchMoreData = () => {
     if (offset > totalOptions) {
@@ -74,9 +100,45 @@ export function Topic(props: any) {
         </div>
         <div className={styles.heading}>
           {topicData?.topicText && (
-            <Typography variant="h2">
+            <Typography variant="h2" className={styles.title}>
               What to bring {topicData.topicText}?
             </Typography>
+          )}
+          {props.user ? (
+            <div className={styles.suggestAnOptionContainer}>
+              <Typography variant="body1">Suggest an option:</Typography>{' '}
+              <CssTextField
+                sx={{ margin: '0 1rem' }}
+                value={suggestOptionText}
+                onChange={(e) => setSuggestOptionText(e.target.value)}
+                focused
+                placeholder=""
+                variant="outlined"
+                inputProps={{ maxLength: 32 }}
+              />
+              <CssButton
+                variant="contained"
+                onClick={async () => {
+                  setSuggestOptionText('');
+                  const myInit = {
+                    headers: {
+                      Authorization: `Bearer ${(await Auth.currentSession())
+                        .getIdToken()
+                        .getJwtToken()}`,
+                    },
+                    body: {
+                      topicId: topicData.topicId,
+                      optionText: suggestOptionText,
+                    },
+                  };
+                  API.post('whatToBringApi', '/suggestOption', myInit);
+                }}
+              >
+                Submit
+              </CssButton>
+            </div>
+          ) : (
+            <div className={styles.suggestAnOptionContainer}></div>
           )}
         </div>
         <div className={styles.contentsContainer}>

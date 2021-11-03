@@ -1,0 +1,7 @@
+{
+    "tableName": "wtbSuggestOptionTable",
+    "partitionKeyName": "topicId",
+    "partitionKeyType": "S",
+    "sortKeyName": "optionText",
+    "sortKeyType": "S"
+}

@@ -1,0 +1,7 @@
+{
+    "tableName": "wtbSuggestTopicTable",
+    "partitionKeyName": "userId",
+    "partitionKeyType": "S",
+    "sortKeyName": "topicText",
+    "sortKeyType": "S"
+}

@@ -15,14 +15,21 @@ AWS.config.update({ region: process.env.TABLE_REGION });
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-let tableName = 'wtbTopicTable';
+let tableName = 'wtbSuggestTopicTable';
 if (process.env.ENV && process.env.ENV !== 'NONE') {
   tableName = tableName + '-' + process.env.ENV;
 }
 
-const partitionKeyName = 'topicId';
-const path = '/topic';
+const userIdPresent = false; // TODO: update in case is required to use that definition
+const partitionKeyName = 'userId';
+const partitionKeyType = 'S';
+const sortKeyName = 'topicText';
+const sortKeyType = 'S';
+const hasSortKey = sortKeyName !== '';
+const path = '/suggestTopic';
+const UNAUTH = 'UNAUTH';
 const hashKeyPath = '/:' + partitionKeyName;
+const sortKeyPath = hasSortKey ? '/:' + sortKeyName : '';
 // declare a new express app
 var app = express();
 app.use(bodyParser.json());
@@ -35,54 +42,21 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.get(path + '/object' + hashKeyPath, function (req, res) {
-  let queryParams = {
+app.post(path, function (req, res) {
+  const params = {
     TableName: tableName,
-    Key: {
-      topicId: req.params[partitionKeyName],
+    Item: {
+      userId: req.apiGateway.event.requestContext.authorizer.claims.sub,
+      topicText: req.body.topicText,
+      options: dynamodb.createSet(req.body.options),
     },
   };
-  dynamodb.get(queryParams, (err, data) => {
+  dynamodb.put(params, (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: 'Could not load items: ' + err });
     } else {
-      res.json(data.Item);
-    }
-  });
-});
-app.get(path + '/objectByText' + hashKeyPath, function (req, res) {
-  let queryParams = {
-    TableName: tableName,
-    Key: {
-      topicText: req.params[partitionKeyName],
-    },
-  };
-  dynamodb.get(queryParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: 'Could not load items: ' + err });
-    } else {
-      res.json(data.Item);
-    }
-  });
-});
-
-app.get(path + '/filter', function (req, res) {
-  let queryParams = {
-    TableName: tableName,
-    FilterExpression: 'contains(topicText, :topicText)',
-    Limit: 8,
-    ExpressionAttributeValues: {
-      ':topicText': req.query.filterText,
-    },
-  };
-  dynamodb.scan(queryParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: 'Could not load items: ' + err });
-    } else {
-      res.json(data.Items);
+      res.json(data);
     }
   });
 });

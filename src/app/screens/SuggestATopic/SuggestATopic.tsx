@@ -9,8 +9,9 @@ import {
   Typography,
 } from '@mui/material';
 import { useHistory, useLocation } from 'react-router-dom';
-import { AddCircle, Delete } from '@mui/icons-material';
-import { useState } from 'react';
+import { AddCircle, Delete, Home } from '@mui/icons-material';
+import { useEffect, useState } from 'react';
+import { API, Auth } from 'aws-amplify';
 
 const CssButton = styled(Button)({
   backgroundColor: '#040403',
@@ -60,6 +61,16 @@ export function SuggestATopic(props: any) {
 
   return (
     <div className={styles.outerContainer}>
+      <div className={styles.homeContainer}>
+        <CssIconButton
+          color="inherit"
+          onClick={() => {
+            history.push('/');
+          }}
+        >
+          <Home fontSize="inherit" />
+        </CssIconButton>{' '}
+      </div>
       <div className={styles.authContainer}>
         <AuthButton user={props.user} />
       </div>
@@ -150,13 +161,25 @@ export function SuggestATopic(props: any) {
         <CssButton
           variant="contained"
           className={styles.button}
-          onClick={() => {
+          onClick={async () => {
             setSubmitTriggered(true);
             if (
               !optionValues.includes('') &&
               !extraOptionValues.includes('') &&
               topicValue !== ''
             ) {
+              const myInit = {
+                headers: {
+                  Authorization: `Bearer ${(await Auth.currentSession())
+                    .getIdToken()
+                    .getJwtToken()}`,
+                },
+                body: {
+                  topicText: topicValue,
+                  options: [...optionValues, ...extraOptionValues],
+                },
+              };
+              API.post('whatToBringApi', '/suggestTopic', myInit);
               history.push('/topic-submitted');
             }
           }}

@@ -17,19 +17,28 @@
             "policyResourceName": "/topic"
         },
         {
+            "name": "/suggestTopic",
+            "lambdaFunction": "wtbSuggestTopicLambda",
+            "privacy": {
+                "open": true
+            },
+            "policyResourceName": "/suggestTopic"
+        },
+        {
             "name": "/vote",
             "lambdaFunction": "wtbVoteLambda",
             "privacy": {
-                "private": true,
-                "auth": [
-                    "/POST",
-                    "/GET",
-                    "/PUT",
-                    "/PATCH",
-                    "/DELETE"
-                ]
+                "open": true
             },
             "policyResourceName": "/vote"
+        },
+        {
+            "name": "/suggestOption",
+            "lambdaFunction": "wtbSuggestOptionLambda",
+            "privacy": {
+                "open": true
+            },
+            "policyResourceName": "/suggestOption"
         }
     ],
     "resourceName": "whatToBringApi",
@@ -42,11 +51,17 @@
             "lambdaFunction": "wtbTopicLambda"
         },
         {
+            "lambdaFunction": "wtbSuggestTopicLambda"
+        },
+        {
             "lambdaFunction": "wtbVoteLambda"
+        },
+        {
+            "lambdaFunction": "wtbSuggestOptionLambda"
         }
     ],
     "privacy": {
-        "auth": 1,
+        "auth": 0,
         "unauth": 0,
         "authRoleName": "amplify-whattobring-dev-142706-authRole",
         "unAuthRoleName": "amplify-whattobring-dev-142706-unauthRole"
@@ -70,12 +85,28 @@
         },
         {
             "category": "function",
+            "resourceName": "wtbSuggestTopicLambda",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
             "resourceName": "wtbVoteLambda",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "wtbSuggestOptionLambda",
             "attributes": [
                 "Name",
                 "Arn"
             ]
         }
     ],
-    "uuid": "84cd9713"
+    "uuid": "4784a53a"
 }

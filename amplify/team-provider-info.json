@@ -27,7 +27,15 @@
         },
         "wtbTopicLambda": {
           "deploymentBucketName": "amplify-whattobring-dev-142706-deployment",
-          "s3Key": "amplify-builds/wtbTopicLambda-4c413052363347773247-build.zip"
+          "s3Key": "amplify-builds/wtbTopicLambda-31756d34355863647856-build.zip"
+        },
+        "wtbSuggestTopicLambda": {
+          "deploymentBucketName": "amplify-whattobring-dev-142706-deployment",
+          "s3Key": "amplify-builds/wtbSuggestTopicLambda-547a334f4344397a4957-build.zip"
+        },
+        "wtbSuggestOptionLambda": {
+          "deploymentBucketName": "amplify-whattobring-dev-142706-deployment",
+          "s3Key": "amplify-builds/wtbSuggestOptionLambda-6f36772f6977756c446b-build.zip"
         }
       }
     }

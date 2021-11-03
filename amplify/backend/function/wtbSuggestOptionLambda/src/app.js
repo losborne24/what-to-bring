@@ -15,74 +15,30 @@ AWS.config.update({ region: process.env.TABLE_REGION });
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-let tableName = 'wtbTopicTable';
+let tableName = 'wtbSuggestOptionTable';
 if (process.env.ENV && process.env.ENV !== 'NONE') {
   tableName = tableName + '-' + process.env.ENV;
 }
-
-const partitionKeyName = 'topicId';
-const path = '/topic';
-const hashKeyPath = '/:' + partitionKeyName;
+const path = '/suggestOption';
 // declare a new express app
 var app = express();
 app.use(bodyParser.json());
 app.use(awsServerlessExpressMiddleware.eventContext());
 
-// Enable CORS for all methods
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-  next();
-});
-
-app.get(path + '/object' + hashKeyPath, function (req, res) {
-  let queryParams = {
+app.post(path, function (req, res) {
+  const params = {
     TableName: tableName,
-    Key: {
-      topicId: req.params[partitionKeyName],
+    Item: {
+      topicId: req.body.topicId,
+      optionText: req.body.optionText,
     },
   };
-  dynamodb.get(queryParams, (err, data) => {
+  dynamodb.put(params, (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: 'Could not load items: ' + err });
     } else {
-      res.json(data.Item);
-    }
-  });
-});
-app.get(path + '/objectByText' + hashKeyPath, function (req, res) {
-  let queryParams = {
-    TableName: tableName,
-    Key: {
-      topicText: req.params[partitionKeyName],
-    },
-  };
-  dynamodb.get(queryParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: 'Could not load items: ' + err });
-    } else {
-      res.json(data.Item);
-    }
-  });
-});
-
-app.get(path + '/filter', function (req, res) {
-  let queryParams = {
-    TableName: tableName,
-    FilterExpression: 'contains(topicText, :topicText)',
-    Limit: 8,
-    ExpressionAttributeValues: {
-      ':topicText': req.query.filterText,
-    },
-  };
-  dynamodb.scan(queryParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: 'Could not load items: ' + err });
-    } else {
-      res.json(data.Items);
+      res.json({});
     }
   });
 });

@@ -21,7 +21,15 @@
   grid-column: span 12;
   margin: 0 1rem;
 }
-
+.title {
+  padding-bottom: 3rem;
+}
+.suggestAnOptionContainer {
+  padding: 1rem 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
 .topicSearchContainer {
   width: 100%;
 }
@@ -34,7 +42,7 @@
 .heading {
   text-align: center;
   box-sizing: border-box;
-  padding: 5rem 1rem;
+  padding: 5rem 1rem 0rem 1rem;
   margin: 0rem 1rem;
   border-bottom: 0.15rem solid #ffcb77;
 }
