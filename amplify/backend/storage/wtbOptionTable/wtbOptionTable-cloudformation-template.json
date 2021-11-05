@@ -46,11 +46,6 @@
           {
             "AttributeName": "topicId",
             "AttributeType": "S"
-          },
-
-          {
-            "AttributeName": "rank",
-            "AttributeType": "N"
           }
         ],
         "KeySchema": [

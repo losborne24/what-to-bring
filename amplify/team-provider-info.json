@@ -39,5 +39,45 @@
         }
       }
     }
+  },
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-whattobring-prod-85416-authRole",
+      "UnauthRoleArn": "arn:aws:iam::846315410327:role/amplify-whattobring-prod-85416-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::846315410327:role/amplify-whattobring-prod-85416-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-whattobring-prod-85416-deployment",
+      "UnauthRoleName": "amplify-whattobring-prod-85416-unauthRole",
+      "StackName": "amplify-whattobring-prod-85416",
+      "StackId": "arn:aws:cloudformation:eu-west-2:846315410327:stack/amplify-whattobring-prod-85416/ed164de0-3e15-11ec-931a-06cec2becf88",
+      "AmplifyAppId": "d1r9y2ca5iugtu"
+    },
+    "categories": {
+      "auth": {
+        "whattobring841dbbc3": {}
+      },
+      "function": {
+        "wtbOptionLambda": {
+          "deploymentBucketName": "amplify-whattobring-prod-85416-deployment",
+          "s3Key": "amplify-builds/wtbOptionLambda-562b5145503253673845-build.zip"
+        },
+        "wtbVoteLambda": {
+          "deploymentBucketName": "amplify-whattobring-prod-85416-deployment",
+          "s3Key": "amplify-builds/wtbVoteLambda-6c47775578442f354979-build.zip"
+        },
+        "wtbTopicLambda": {
+          "deploymentBucketName": "amplify-whattobring-prod-85416-deployment",
+          "s3Key": "amplify-builds/wtbTopicLambda-31756d34355863647856-build.zip"
+        },
+        "wtbSuggestTopicLambda": {
+          "deploymentBucketName": "amplify-whattobring-prod-85416-deployment",
+          "s3Key": "amplify-builds/wtbSuggestTopicLambda-547a334f4344397a4957-build.zip"
+        },
+        "wtbSuggestOptionLambda": {
+          "deploymentBucketName": "amplify-whattobring-prod-85416-deployment",
+          "s3Key": "amplify-builds/wtbSuggestOptionLambda-6f36772f6977756c446b-build.zip"
+        }
+      }
+    }
   }
 }
