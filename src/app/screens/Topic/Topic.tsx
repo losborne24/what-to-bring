@@ -62,29 +62,30 @@ export function Topic(props: any) {
   const offset = useAppSelector(selectOffset);
   const [hasMore, setHasMore] = useState(true);
   const [suggestOptionText, setSuggestOptionText] = useState('');
-
+  const [topicId, setTopicId] = useState('');
   const fetchMoreData = () => {
     if (offset > totalOptions) {
       setHasMore(false);
       return;
     }
-    dispatch(
-      moreOptionsAsync({ topicId: location.pathname.substr(1), offset: offset })
-    );
+    dispatch(moreOptionsAsync({ topicId, offset: offset }));
   };
 
   useEffect(() => {
-    ReactGA.send({ hitType: 'pageview', page: location.pathname });
+    if (location.pathname.slice(-1) === '/') {
+      setTopicId(location.pathname.substring(1, location.pathname.length - 1));
+    } else {
+      setTopicId(location.pathname.substr(1));
+    }
+    ReactGA.send({ hitType: 'pageview', page: topicId });
   }, []);
 
   useEffect(() => {
     if (props.user !== null) {
-      dispatch(topicAsync(location.pathname.substr(1)));
-      dispatch(
-        moreOptionsAsync({ topicId: location.pathname.substr(1), offset: 0 })
-      );
+      dispatch(topicAsync(topicId));
+      dispatch(moreOptionsAsync({ topicId, offset: 0 }));
       if (props.user) {
-        dispatch(userVotesAsync(location.pathname.substr(1)));
+        dispatch(userVotesAsync(topicId));
       }
     }
   }, [props.user]);
