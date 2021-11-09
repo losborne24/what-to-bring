@@ -60,7 +60,7 @@ export function SuggestATopic(props: any) {
   const [topicValue, setTopicValue] = useState<string>('');
   const [isSubmitTriggered, setSubmitTriggered] = useState<boolean>(false);
   useEffect(() => {
-    ReactGA.send('/suggestATopic');
+    ReactGA.send({ hitType: 'pageview', page: '/suggestATopic' });
   }, []);
   return (
     <div className={styles.outerContainer}>

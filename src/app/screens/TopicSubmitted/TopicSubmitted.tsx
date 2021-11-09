@@ -14,7 +14,7 @@ export function TopicSubmitted(props: any) {
   const history = useHistory();
   const location = useLocation();
   useEffect(() => {
-    ReactGA.send(location.pathname);
+    ReactGA.send({ hitType: 'pageview', page: 'topicSubmitted' });
   }, []);
   return (
     <div>

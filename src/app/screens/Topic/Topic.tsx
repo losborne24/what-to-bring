@@ -72,9 +72,11 @@ export function Topic(props: any) {
       moreOptionsAsync({ topicId: location.pathname.substr(1), offset: offset })
     );
   };
+
   useEffect(() => {
-    ReactGA.send(location.pathname);
+    ReactGA.send({ hitType: 'pageview', page: location.pathname });
   }, []);
+
   useEffect(() => {
     if (props.user !== null) {
       dispatch(topicAsync(location.pathname.substr(1)));

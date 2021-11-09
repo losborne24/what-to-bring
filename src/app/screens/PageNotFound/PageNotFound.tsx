@@ -14,7 +14,7 @@ export function PageNotFound(props: any) {
   const history = useHistory();
   const location = useLocation();
   useEffect(() => {
-    ReactGA.send('/pageNotFound');
+    ReactGA.send({ hitType: 'pageview', page: '/pageNotFound' });
   }, []);
   return (
     <div>
