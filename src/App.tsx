@@ -20,7 +20,6 @@ function App() {
 
   useEffect(() => {
     ReactGA.initialize('G-B0YF8CLRBE');
-    ReactGA.send('pageview');
   }, []);
 
   useEffect(() => {
