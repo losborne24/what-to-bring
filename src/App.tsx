@@ -13,9 +13,15 @@ import { Topic } from './app/screens/Topic/Topic';
 import { PageNotFound } from './app/screens/PageNotFound/PageNotFound';
 import { SuggestATopic } from './app/screens/SuggestATopic/SuggestATopic';
 import { TopicSubmitted } from './app/screens/TopicSubmitted/TopicSubmitted';
+import ReactGA from 'react-ga4';
 
 function App() {
   const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    ReactGA.initialize('G-B0YF8CLRBE');
+    ReactGA.send('/');
+  }, []);
 
   useEffect(() => {
     Hub.listen('auth', ({ payload: { event, data } }) => {

@@ -2,8 +2,14 @@ import { AuthButton } from '../../../features/AuthButton/AuthButton';
 import styles from './Home.module.scss';
 import { TopicSearch } from '../../../features/TopicSearch/TopicSearch';
 import { Typography } from '@mui/material';
+import { useEffect } from 'react';
+import ReactGA from 'react-ga4';
 
 export function Home(props: any) {
+  useEffect(() => {
+    ReactGA.send('/home');
+  }, []);
+
   return (
     <div>
       <div className={styles.authContainer}>

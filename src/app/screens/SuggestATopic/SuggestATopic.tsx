@@ -12,6 +12,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { AddCircle, Delete, Home } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { API, Auth } from 'aws-amplify';
+import ReactGA from 'react-ga4';
 
 const CssButton = styled(Button)({
   backgroundColor: '#040403',
@@ -58,7 +59,9 @@ export function SuggestATopic(props: any) {
   ]);
   const [topicValue, setTopicValue] = useState<string>('');
   const [isSubmitTriggered, setSubmitTriggered] = useState<boolean>(false);
-
+  useEffect(() => {
+    ReactGA.send('/suggestATopic');
+  }, []);
   return (
     <div className={styles.outerContainer}>
       <div className={styles.homeContainer}>

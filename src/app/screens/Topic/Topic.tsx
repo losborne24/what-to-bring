@@ -27,6 +27,7 @@ import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { AuthButton } from '../../../features/AuthButton/AuthButton';
 import { API, Auth } from 'aws-amplify';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import ReactGA from 'react-ga4';
 
 const CssIconButton = styled(IconButton)({
   backgroundColor: '#ffcb77',
@@ -71,7 +72,9 @@ export function Topic(props: any) {
       moreOptionsAsync({ topicId: location.pathname.substr(1), offset: offset })
     );
   };
-
+  useEffect(() => {
+    ReactGA.send(location.pathname);
+  }, []);
   useEffect(() => {
     if (props.user !== null) {
       dispatch(topicAsync(location.pathname.substr(1)));

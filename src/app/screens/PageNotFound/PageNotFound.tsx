@@ -2,6 +2,8 @@ import { AuthButton } from '../../../features/AuthButton/AuthButton';
 import styles from './PageNotFound.module.scss';
 import { Button, styled, Typography } from '@mui/material';
 import { useHistory, useLocation } from 'react-router-dom';
+import ReactGA from 'react-ga4';
+import { useEffect } from 'react';
 
 const CssButton = styled(Button)({
   backgroundColor: '#040403',
@@ -11,6 +13,9 @@ const CssButton = styled(Button)({
 export function PageNotFound(props: any) {
   const history = useHistory();
   const location = useLocation();
+  useEffect(() => {
+    ReactGA.send('/pageNotFound');
+  }, []);
   return (
     <div>
       <div className={styles.authContainer}>
