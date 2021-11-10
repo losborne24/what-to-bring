@@ -6,7 +6,7 @@ import {
   styled,
   TextField,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import {
@@ -62,30 +62,34 @@ export function Topic(props: any) {
   const offset = useAppSelector(selectOffset);
   const [hasMore, setHasMore] = useState(true);
   const [suggestOptionText, setSuggestOptionText] = useState('');
-  const [topicId, setTopicId] = useState('');
+  const topicId = useRef('');
+
   const fetchMoreData = () => {
     if (offset > totalOptions) {
       setHasMore(false);
       return;
     }
-    dispatch(moreOptionsAsync({ topicId, offset: offset }));
+    dispatch(moreOptionsAsync({ topicId: topicId.current, offset: offset }));
   };
 
   useEffect(() => {
     if (location.pathname.slice(-1) === '/') {
-      setTopicId(location.pathname.substring(1, location.pathname.length - 1));
+      topicId.current = location.pathname.substring(
+        1,
+        location.pathname.length - 1
+      );
     } else {
-      setTopicId(location.pathname.substr(1));
+      topicId.current = location.pathname.substr(1);
     }
     ReactGA.send({ hitType: 'pageview', page: topicId });
   }, []);
 
   useEffect(() => {
     if (props.user !== null) {
-      dispatch(topicAsync(topicId));
-      dispatch(moreOptionsAsync({ topicId, offset: 0 }));
+      dispatch(topicAsync(topicId.current));
+      dispatch(moreOptionsAsync({ topicId: topicId.current, offset: 0 }));
       if (props.user) {
-        dispatch(userVotesAsync(topicId));
+        dispatch(userVotesAsync(topicId.current));
       }
     }
   }, [props.user]);
