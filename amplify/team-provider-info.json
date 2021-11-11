@@ -67,7 +67,7 @@
         },
         "wtbTopicLambda": {
           "deploymentBucketName": "amplify-whattobring-prod-85416-deployment",
-          "s3Key": "amplify-builds/wtbTopicLambda-44534367677946365679-build.zip"
+          "s3Key": "amplify-builds/wtbTopicLambda-343633566f442b714d4c-build.zip"
         },
         "wtbSuggestTopicLambda": {
           "deploymentBucketName": "amplify-whattobring-prod-85416-deployment",
