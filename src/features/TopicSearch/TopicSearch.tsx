@@ -65,7 +65,7 @@ export function TopicSearch() {
       }}
       filterOptions={(options, state) => options}
       freeSolo
-      options={filterTopics}
+      options={filterTopics.slice(0, 8)}
       getOptionLabel={(option) => option.topicText || option}
       className={styles.autocomplete}
       renderInput={(params) => (

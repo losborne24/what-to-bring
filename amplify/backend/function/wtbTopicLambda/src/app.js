@@ -72,7 +72,6 @@ app.get(path + '/filter', function (req, res) {
   let queryParams = {
     TableName: tableName,
     FilterExpression: 'contains(topicText, :topicText)',
-    MaxItems: 8,
     ExpressionAttributeValues: {
       ':topicText': req.query.filterText,
     },
